@@ -1,0 +1,3053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BHAGAM BHAAG – THE SEMESTER SURVIVAL RUN</title>
+  <meta name="description" content="BHAGAM BHAAG – THE SEMESTER SURVIVAL RUN. Run for your life. Study for your degree." />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@500;600;700;800&display=swap');
+
+    :root {
+      --primary: #ff6b2b;
+      --primary-dark: #d94e14;
+      --accent: #ffd13b;
+      --cyan: #22d3ee;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --glass: rgba(15, 23, 42, 0.72);
+      --glass-border: rgba(255, 255, 255, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0f172a;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: #ffffff;
+      touch-action: none;
+    }
+
+    #game-container {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* HUD */
+    #hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      display: none;
+      padding: 14px 16px;
+    }
+
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .hud-card {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 8px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    .hud-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 120px;
+    }
+
+    .hud-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+    }
+
+    .hud-value {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #ffffff;
+      transition: transform 0.12s ease-out;
+    }
+    .hud-value.pop {
+      transform: scale(1.25);
+      color: #fde047;
+    }
+
+    .hud-sub {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .hud-center {
+      flex: 1;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sem-pill {
+      width: 100%;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 7px 12px;
+      text-align: center;
+    }
+
+    .sem-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sem-bar-wrap {
+      margin-top: 5px;
+      width: 100%;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .sem-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff6b2b, #ffd13b, #10b981);
+      border-radius: 999px;
+      transition: width 0.2s ease-out;
+    }
+
+    .chase-meter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .chase-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .hud-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .credits-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .coin-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff3a1, #f59e0b);
+      border: 2px solid #fef08a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #78350f;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45);
+    }
+
+    .icon-btn {
+      pointer-events: auto;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      color: #ffffff;
+      font-size: 17px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.12s, background 0.15s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(30, 41, 59, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* Power-up indicators */
+    #powerup-bar {
+      position: fixed;
+      top: 94px;
+      left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    .pu-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--glass);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 12px;
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+      animation: popIn 0.2s ease-out;
+    }
+
+    .pu-timer {
+      font-family: 'Fredoka', sans-serif;
+      color: var(--accent);
+      margin-left: 4px;
+    }
+
+    /* Funny message & milestone banner */
+    #toast-banner {
+      position: fixed;
+      top: 102px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-12px);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.92));
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 10px 20px;
+      text-align: center;
+      z-index: 15;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      max-width: min(90vw, 440px);
+    }
+
+    #toast-banner.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #toast-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    #toast-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-top: 2px;
+    }
+
+    /* Red danger vignette when professor is super close */
+    #danger-vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9;
+      box-shadow: inset 0 0 90px rgba(239, 68, 68, 0);
+      transition: box-shadow 0.25s ease;
+    }
+
+    #danger-vignette.active {
+      box-shadow: inset 0 0 110px rgba(239, 68, 68, 0.65);
+      animation: pulseVignette 0.8s infinite alternate;
+    }
+
+    @keyframes pulseVignette {
+      from { box-shadow: inset 0 0 70px rgba(239, 68, 68, 0.4); }
+      to { box-shadow: inset 0 0 130px rgba(239, 68, 68, 0.78); }
+    }
+
+    /* Mobile controls */
+    #mobile-controls {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 12;
+      pointer-events: none;
+    }
+
+    .ctrl-btn {
+      pointer-events: auto;
+      width: 56px;
+      height: 52px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      active-scale: 0.92;
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.9);
+      background: rgba(255, 107, 43, 0.75);
+    }
+
+    @media (max-width: 768px), (pointer: coarse) {
+      #mobile-controls.visible {
+        display: flex;
+      }
+      .hud-value {
+        font-size: 19px;
+      }
+      .hud-card {
+        padding: 6px 10px;
+      }
+      .sem-pill {
+        padding: 5px 8px;
+      }
+      .sem-title {
+        font-size: 11px;
+      }
+    }
+
+    /* Overlays (Start, Tutorial, Pause, Game Over, Graduation) */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.65), rgba(2, 6, 23, 0.88));
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 470px;
+      background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 24px;
+      padding: 26px 24px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      animation: popIn 0.25s ease-out;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.94) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .badge-tag {
+      display: inline-block;
+      background: rgba(255, 107, 43, 0.18);
+      border: 1px solid rgba(255, 107, 43, 0.45);
+      color: #fdba74;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .game-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(34px, 6.5vw, 48px);
+      font-weight: 700;
+      line-height: 1.02;
+      letter-spacing: 0.03em;
+      transform: skewX(-4deg);
+      background: linear-gradient(180deg, #fffbeb 0%, #ffd13b 45%, #ff5500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 5px 14px rgba(255, 85, 0, 0.5));
+    }
+    .arcade-brand-pill {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #fde047;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .game-subtitle {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: #38bdf8;
+      margin-top: 4px;
+    }
+
+    .tagline {
+      margin-top: 10px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: #cbd5e1;
+    }
+
+    .best-score-pill {
+      margin: 14px auto 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 209, 59, 0.12);
+      border: 1px solid rgba(255, 209, 59, 0.35);
+      color: #fde047;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tutorial-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      text-align: left;
+    }
+
+    .tut-item {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 9px 10px;
+      font-size: 12px;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tut-key {
+      min-width: 30px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--accent);
+    }
+
+    .btn-primary {
+      margin-top: 18px;
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ff7a33, #f94d1c);
+      color: #ffffff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(249, 77, 28, 0.45);
+      transition: transform 0.14s, filter 0.15s;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      margin-top: 10px;
+      width: 100%;
+      padding: 11px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .stats-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 10px;
+    }
+
+    .stat-box .lbl {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    .stat-box .val {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .funny-result {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(255, 209, 59, 0.12);
+      border: 1px solid rgba(255, 209, 59, 0.3);
+      color: #fef08a;
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+
+    .mini-toggle {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #crash-flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 25;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.9), rgba(239, 68, 68, 0.85));
+      opacity: 0;
+      transition: opacity 0.12s ease-out;
+    }
+    #crash-flash.active {
+      opacity: 1;
+    }
+    @keyframes failShake {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      15% { transform: translate(-10px, 6px) rotate(-2deg); }
+      30% { transform: translate(10px, -6px) rotate(2deg); }
+      45% { transform: translate(-8px, -4px) rotate(-1.5deg); }
+      60% { transform: translate(8px, 4px) rotate(1.5deg); }
+      75% { transform: translate(-4px, 2px) rotate(-0.5deg); }
+    }
+    .modal-card.fail-shake {
+      animation: failShake 0.55s ease-out;
+      border-color: rgba(239, 68, 68, 0.65);
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.55), 0 24px 60px rgba(0, 0, 0, 0.65);
+    }
+    .fail-title {
+      background: linear-gradient(180deg, #ffffff 0%, #fca5a5 40%, #ef4444 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      filter: drop-shadow(0 4px 16px rgba(239, 68, 68, 0.65)) !important;
+    }
+
+    .meters-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+    .mini-meter {
+      flex: 1;
+      background: var(--glass);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 4px 8px;
+    }
+    .mini-meter-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    .mini-bar-wrap {
+      margin-top: 3px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .mini-bar-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: 999px;
+      transition: width 0.2s ease, background 0.2s ease;
+    }
+    #dream-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      background: radial-gradient(circle at center, rgba(244, 114, 182, 0.08), rgba(236, 72, 153, 0.35));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #dream-overlay.active { opacity: 1; }
+    #sleep-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      background: radial-gradient(circle at center, rgba(30, 58, 138, 0.15), rgba(15, 23, 42, 0.65));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #sleep-overlay.active { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div id="game-container"></div>
+  <div id="danger-vignette"></div>
+  <div id="crash-flash"></div>
+  <div id="dream-overlay"></div>
+  <div id="sleep-overlay"></div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-top">
+      <div class="hud-card hud-left">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="hud-score">0</span>
+        <span class="hud-sub" id="hud-distance">0 m</span>
+      </div>
+
+      <div class="hud-center">
+        <div class="sem-pill">
+          <div class="sem-title" id="hud-sem">Sem 1: Welcome to Engineering</div>
+          <div class="sem-bar-wrap">
+            <div class="sem-bar-fill" id="hud-sem-bar"></div>
+          </div>
+        </div>
+        <div class="meters-row">
+          <div class="mini-meter">
+            <div class="mini-meter-top"><span>🎯 Focus</span><span id="hud-focus-val">100%</span></div>
+            <div class="mini-bar-wrap"><div class="mini-bar-fill" id="hud-focus-bar" style="background:#38bdf8;"></div></div>
+          </div>
+          <div class="mini-meter">
+            <div class="mini-meter-top"><span>📋 Attend</span><span id="hud-att-val">82%</span></div>
+            <div class="mini-bar-wrap"><div class="mini-bar-fill" id="hud-att-bar" style="background:#10b981;"></div></div>
+          </div>
+        </div>
+        <div class="chase-meter">
+          <span class="chase-dot" id="chase-dot"></span>
+          <span id="chase-label">Prof Distance: Safe</span>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <div class="hud-card credits-card">
+          <div class="coin-icon">C</div>
+          <div>
+            <div class="hud-label">Credits</div>
+            <div class="hud-value" id="hud-credits" style="font-size: 20px;">0</div>
+          </div>
+        </div>
+        <button class="icon-btn" id="btn-sound-hud" title="Toggle Sound">🔊</button>
+        <button class="icon-btn" id="btn-pause" title="Pause Game">⏸</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Powerups -->
+  <div id="powerup-bar"></div>
+
+  <!-- Funny Toast / Milestone Banner -->
+  <div id="toast-banner">
+    <div id="toast-title">Semester 1</div>
+    <div id="toast-sub">Attendance is below 75%! RUN!</div>
+  </div>
+
+  <!-- On-screen Mobile Controls -->
+  <div id="mobile-controls">
+    <button class="ctrl-btn" id="m-left" aria-label="Move Left">◀</button>
+    <button class="ctrl-btn" id="m-down" aria-label="Slide">▼</button>
+    <button class="ctrl-btn" id="m-up" aria-label="Jump">▲</button>
+    <button class="ctrl-btn" id="m-right" aria-label="Move Right">▶</button>
+  </div>
+
+  <!-- Start Screen -->
+  <div class="overlay" id="screen-start">
+    <div class="modal-card">
+      <div class="badge-tag">🏃‍♂️ Indian Arcade Campus Runner</div>
+      <h1 class="game-title">BHAGAM BHAAG</h1>
+      <div class="game-subtitle">THE SEMESTER SURVIVAL RUN</div>
+      <p class="tagline">
+        <strong>Run for your life. Study for your degree.</strong><br />
+        Your attendance dropped below 75% — sprint across all 8 semesters!
+      </p>
+      <div class="best-score-pill">🏆 Best Score: <span id="start-best">0</span></div>
+
+      <div class="tutorial-grid">
+        <div class="tut-item"><span class="tut-key">◀ ▶</span><span>Switch Lanes (A/D or Swipe)</span></div>
+        <div class="tut-item"><span class="tut-key">▲</span><span>Jump Obstacles (W/Space)</span></div>
+        <div class="tut-item"><span class="tut-key">▼</span><span>Slide Under Gates (S/Down)</span></div>
+        <div class="tut-item"><span class="tut-key">☕</span><span>Grab Coffee, Notes &amp; ID!</span></div>
+      </div>
+
+      <button class="btn-primary" id="btn-start">START RUNNING</button>
+      <div class="row-actions">
+        <button class="mini-toggle" id="btn-sound-start">🔊 Sound: ON</button>
+        <button class="mini-toggle" id="btn-touch-toggle">🎮 Touch Buttons: Auto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause Screen -->
+  <div class="overlay hidden" id="screen-pause">
+    <div class="modal-card">
+      <div class="arcade-brand-pill">BHAGAM BHAAG</div>
+      <div class="badge-tag">Class Break</div>
+      <h2 class="game-title" style="font-size: 32px;">GAME PAUSED</h2>
+      <p class="tagline">Catch your breath before the HOD spots your attendance sheet.</p>
+      <button class="btn-primary" id="btn-resume">RESUME RUN</button>
+      <button class="btn-secondary" id="btn-restart-pause">RESTART SEMESTER 1</button>
+    </div>
+  </div>
+
+  <!-- Game Over / Graduation Screen -->
+  <div class="overlay hidden" id="screen-gameover">
+    <div class="modal-card">
+      <div class="arcade-brand-pill">BHAGAM BHAAG • SEMESTER REPORT CARD</div>
+      <div class="badge-tag" id="go-badge">Caught by Faculty!</div>
+      <h2 class="game-title" id="go-title" style="font-size: 34px;">BACKLOG UNLOCKED!</h2>
+      <div class="funny-result" id="go-message">"Your attendance is 74.9%. See you next semester!"</div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="lbl">Final Score</div>
+          <div class="val" id="go-score">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="lbl">Credits Collected</div>
+          <div class="val" id="go-credits">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="lbl">Semester Reached</div>
+          <div class="val" id="go-sem" style="font-size: 18px;">Sem 1</div>
+        </div>
+        <div class="stat-box">
+          <div class="lbl">Best Score</div>
+          <div class="val" id="go-best" style="color: #fde047;">0</div>
+        </div>
+        <div class="stat-box finale-stat" style="display: none;">
+          <div class="lbl">Attendance / Focus</div>
+          <div class="val" id="go-att-focus" style="font-size: 16px; color: #34d399;">100% / 100%</div>
+        </div>
+        <div class="stat-box finale-stat" style="display: none;">
+          <div class="lbl">Backlogs / Rating</div>
+          <div class="val" id="go-rating" style="font-size: 15px; color: #fde047;">0 • S+</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-play-again">PLAY AGAIN</button>
+      <button class="btn-secondary" id="btn-main-menu">MAIN MENU</button>
+      <button class="btn-secondary" id="btn-continue-endless" style="display: none;">CONTINUE ENDLESS ALUMNI RUN</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================
+      // 1. CONSTANTS & CONFIGURATION
+      // =========================================================
+      const LANES = [-2.6, 0, 2.6];
+      const SEGMENT_LENGTH = 26;
+      const NUM_SEGMENTS = 8;
+      const STORAGE_KEY = 'bhagam_bhaag_high_score_v1';
+
+      const SEMESTERS = [
+        { num: 1, name: 'Welcome to Engineering', dist: 0, speed: 16.5, prof: 'math', msg: 'Attendance is below 75%! RUN!' },
+        { num: 2, name: 'Assignment Pressure', dist: 160, speed: 18.5, prof: 'math', msg: 'Assignment due in 10 seconds!' },
+        { num: 3, name: 'Mid-Sem Madness', dist: 360, speed: 20.5, prof: 'physics', msg: 'Physics Sir spotted you in the corridor!' },
+        { num: 4, name: 'Viva Terror', dist: 600, speed: 22.5, prof: 'physics', msg: 'Surprise Viva Incoming!' },
+        { num: 5, name: 'Practical Apocalypse', dist: 880, speed: 24.5, prof: 'lab', msg: 'Lab Professor says: Show your observation book!' },
+        { num: 6, name: 'Backlog Attack', dist: 1200, speed: 26.5, prof: 'lab', msg: 'CGPA under pressure! Dodge those backlogs!' },
+        { num: 7, name: 'Placement Pressure', dist: 1560, speed: 28.5, prof: 'hod', msg: 'HOD has entered the campus!' },
+        { num: 8, name: 'Final Graduation Run', dist: 1960, speed: 30.5, prof: 'hod', msg: 'Final Semester! Sprint to the Graduation Gate!' }
+      ];
+      const GRADUATION_DISTANCE = 2420;
+      const FINALE_END_DISTANCE = 2780;
+
+      const FUNNY_QUOTES = [
+        'Attendance is below 75%! RUN!',
+        'Professor detected!',
+        'Surprise Viva Incoming!',
+        'Assignment due in 10 seconds!',
+        'CGPA under pressure!',
+        'HOD has entered the campus!',
+        'Bunking detected on CCTV!',
+        'Proxy failed! Sprint!'
+      ];
+
+      const GAMEOVER_MESSAGES = [
+        'Caught! "Your attendance is 74.8%. See you in summer school!"',
+        'Caught! "Explain the 2nd Law of Thermodynamics right now!"',
+        'Caught! "Where is your practical file with red-pen signature?"',
+        'Caught! "Backlog unlocked! Better luck next semester!"'
+      ];
+
+      // =========================================================
+      // 2. WEB AUDIO SYNTHESIZER (NO EXTERNAL AUDIO FILES)
+      // =========================================================
+      const SoundFX = {
+        ctx: null,
+        enabled: true,
+        init() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.ctx = new AudioCtx();
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        },
+        playTone(freq, endFreq, duration, type = 'sine', vol = 0.12) {
+          if (!this.enabled || !this.ctx) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, now);
+            if (endFreq !== freq) {
+              osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), now + duration);
+            }
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + duration);
+          } catch (e) {}
+        },
+        jump() { this.playTone(260, 560, 0.16, 'sine', 0.13); },
+        slide() { this.playTone(320, 120, 0.15, 'triangle', 0.11); },
+        lane() { this.playTone(420, 500, 0.06, 'sine', 0.06); },
+        coin() {
+          this.playTone(880, 1320, 0.09, 'sine', 0.1);
+        },
+        distract() {
+          this.playTone(660, 440, 0.11, 'sine', 0.11);
+          setTimeout(() => this.playTone(587, 392, 0.14, 'triangle', 0.1), 90);
+        },
+        study() {
+          this.playTone(523, 1046, 0.15, 'sine', 0.12);
+        },
+        powerup() {
+          this.playTone(523, 784, 0.12, 'triangle', 0.13);
+          setTimeout(() => this.playTone(784, 1046, 0.16, 'triangle', 0.13), 80);
+        },
+        hit() { this.playTone(170, 55, 0.25, 'sawtooth', 0.16); },
+        shieldBreak() { this.playTone(600, 220, 0.2, 'square', 0.1); },
+        semester() {
+          [523, 659, 784, 1046].forEach((f, i) => {
+            setTimeout(() => this.playTone(f, f * 1.02, 0.14, 'triangle', 0.12), i * 75);
+          });
+        },
+        failCrash() {
+          if (!this.enabled || !this.ctx) return;
+          try {
+            const now = this.ctx.currentTime;
+            // White noise impact burst
+            const bufSize = Math.floor(this.ctx.sampleRate * 0.35);
+            const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < bufSize; i++) {
+              data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.28));
+            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buf;
+            const nGain = this.ctx.createGain();
+            nGain.gain.setValueAtTime(0.32, now);
+            nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            noise.connect(nGain);
+            nGain.connect(this.ctx.destination);
+            noise.start(now);
+
+            // Sub-bass boom + crazy siren + comic fail wah-wah
+            this.playTone(150, 32, 0.45, 'sawtooth', 0.24);
+            this.playTone(880, 220, 0.38, 'square', 0.12);
+            setTimeout(() => this.playTone(392, 349, 0.18, 'sawtooth', 0.14), 220);
+            setTimeout(() => this.playTone(349, 311, 0.18, 'sawtooth', 0.14), 400);
+            setTimeout(() => this.playTone(293, 185, 0.45, 'sawtooth', 0.16), 580);
+          } catch (e) {}
+        },
+        gameover() {
+          this.failCrash();
+        },
+        cheering() {
+          if (!this.enabled || !this.ctx) return;
+          try {
+            // Fireworks pops + crowd cheer swell + victory fanfare
+            [0, 260, 520].forEach((delay) => {
+              setTimeout(() => {
+                this.playTone(180, 520, 0.16, 'sine', 0.1);
+                setTimeout(() => this.playTone(90, 35, 0.22, 'sawtooth', 0.14), 140);
+              }, delay);
+            });
+            const notes = [523, 659, 784, 1046, 1318, 1568];
+            notes.forEach((f, i) => {
+              setTimeout(() => this.playTone(f, f * 1.01, 0.26, 'triangle', 0.15), i * 95);
+            });
+          } catch (e) {}
+        },
+        graduate() {
+          this.cheering();
+        }
+      };
+
+      // =========================================================
+      // 3. PROCEDURAL CANVAS TEXTURES FOR SIGNS & OBSTACLES
+      // =========================================================
+      function makeSignTexture(bg, fg, title, subtitle = '', border = '#ffffff') {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 256;
+        const g = c.getContext('2d');
+        g.fillStyle = bg;
+        g.fillRect(0, 0, 512, 256);
+        g.strokeStyle = border;
+        g.lineWidth = 14;
+        g.strokeRect(10, 10, 492, 236);
+        g.fillStyle = fg;
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.font = 'bold 54px sans-serif';
+        g.fillText(title, 256, subtitle ? 98 : 128);
+        if (subtitle) {
+          g.font = 'bold 30px sans-serif';
+          g.fillText(subtitle, 256, 174);
+        }
+        const tex = new THREE.CanvasTexture(c);
+        tex.needsUpdate = true;
+        return tex;
+      }
+
+      const TEXTURES = {
+        midSem: makeSignTexture('#fef3c7', '#b45309', 'MID-SEM', 'EXAM PAPER', '#f59e0b'),
+        endSem: makeSignTexture('#dc2626', '#ffffff', 'END-SEM', 'DANGER: NO MERCY', '#fef08a'),
+        attendance: makeSignTexture('#1e293b', '#f87171', 'ATTENDANCE < 75%', 'SLIDE UNDER!', '#ef4444'),
+        project: makeSignTexture('#1d4ed8', '#ffffff', 'PROJECT FILE', 'FINAL SUBMISSION', '#93c5fd'),
+        campusMain: makeSignTexture('#0f172a', '#ffd13b', 'NIAMT / TECH CAMPUS', 'ENGINEERING BLOCK', '#ffd13b'),
+        labSign: makeSignTexture('#065f46', '#ecfdf5', 'COMPUTER & TECH LAB', 'NO FOOD / NO BUNK', '#34d399'),
+        noticeBoard: makeSignTexture('#fffbeb', '#1e293b', 'NOTICE BOARD', '75% MANDATORY!', '#92400e'),
+        gradGate: makeSignTexture('#7c2d12', '#fef08a', 'CONVOCATION GATE', 'B.TECH GRADUATE', '#fbbf24')
+      };
+
+      // =========================================================
+      // 4. THREE.JS SCENE, CAMERA, RENDERER & LIGHTING
+      // =========================================================
+      const container = document.getElementById('game-container');
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87ceeb);
+      scene.fog = new THREE.Fog(0x9bd7f5, 55, 165);
+
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 240);
+      camera.position.set(0, 5.2, 9.2);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      container.appendChild(renderer.domElement);
+
+      // Stylized Sky Dome
+      const skyGeo = new THREE.SphereGeometry(200, 24, 16);
+      const skyMat = new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        depthWrite: false,
+        uniforms: {
+          topColor: { value: new THREE.Color(0x0284c7) },
+          bottomColor: { value: new THREE.Color(0xbae6fd) }
+        },
+        vertexShader: 'varying vec3 vWorldPos; void main(){ vec4 wp = modelMatrix * vec4(position,1.0); vWorldPos = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }',
+        fragmentShader: 'uniform vec3 topColor; uniform vec3 bottomColor; varying vec3 vWorldPos; void main(){ float h = normalize(vWorldPos).y; gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h,0.0), 0.65), 0.0)), 1.0); }'
+      });
+      scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+      // Procedural PBR Road, Sidewalk & Grass Textures
+      function makeTiledTexture(drawFn, repeatX, repeatY) {
+        const c = document.createElement('canvas');
+        c.width = 256; c.height = 256;
+        drawFn(c.getContext('2d'));
+        const t = new THREE.CanvasTexture(c);
+        t.wrapS = THREE.RepeatWrapping;
+        t.wrapT = THREE.RepeatWrapping;
+        t.repeat.set(repeatX, repeatY);
+        t.encoding = THREE.sRGBEncoding;
+        return t;
+      }
+
+      const roadTex = makeTiledTexture((g) => {
+        g.fillStyle = '#2b3445';
+        g.fillRect(0, 0, 256, 256);
+        for (let i = 0; i < 1600; i++) {
+          g.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.08)';
+          g.fillRect(Math.random() * 256, Math.random() * 256, 3, 3);
+        }
+      }, 2, 6);
+
+      const paverTex = makeTiledTexture((g) => {
+        g.fillStyle = '#cbd5e1';
+        g.fillRect(0, 0, 256, 256);
+        g.strokeStyle = '#94a3b8';
+        g.lineWidth = 3;
+        for (let y = 0; y < 256; y += 32) {
+          g.beginPath(); g.moveTo(0, y); g.lineTo(256, y); g.stroke();
+          const off = (y / 32) % 2 === 0 ? 0 : 32;
+          for (let x = off; x < 256; x += 64) {
+            g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 32); g.stroke();
+          }
+        }
+      }, 1, 8);
+
+      const grassTex = makeTiledTexture((g) => {
+        g.fillStyle = '#3f8f34';
+        g.fillRect(0, 0, 256, 256);
+        for (let i = 0; i < 1200; i++) {
+          g.fillStyle = Math.random() > 0.5 ? '#4da840' : '#327829';
+          g.fillRect(Math.random() * 256, Math.random() * 256, 4, 8);
+        }
+      }, 4, 4);
+
+      // Bright Daylight Lighting
+      const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x3f6212, 0.85);
+      scene.add(hemiLight);
+
+      const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.15);
+      sunLight.position.set(22, 38, 18);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 1024;
+      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.camera.near = 2;
+      sunLight.shadow.camera.far = 120;
+      const d = 26;
+      sunLight.shadow.camera.left = -d;
+      sunLight.shadow.camera.right = d;
+      sunLight.shadow.camera.top = d;
+      sunLight.shadow.camera.bottom = -d;
+      sunLight.shadow.bias = -0.0005;
+      scene.add(sunLight);
+
+      const fillLight = new THREE.DirectionalLight(0xbae6fd, 0.45);
+      fillLight.position.set(-18, 14, -20);
+      scene.add(fillLight);
+
+      // Shared Materials
+      const MATS = {
+        road: new THREE.MeshStandardMaterial({ map: roadTex, roughness: 0.78, metalness: 0.05 }),
+        sidewalk: new THREE.MeshStandardMaterial({ map: paverTex, roughness: 0.72 }),
+        grass: new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.92 }),
+        laneMark: new THREE.MeshBasicMaterial({ color: 0xfef08a }),
+        curb: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.7 }),
+        skin: new THREE.MeshStandardMaterial({ color: 0xc68642, roughness: 0.6 }),
+        shirt: new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.7 }),
+        jeans: new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.8 }),
+        sneaker: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 }),
+        backpack: new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.7 }),
+        hairDark: new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 }),
+        hairGrey: new THREE.MeshStandardMaterial({ color: 0xd1d5db, roughness: 0.8 }),
+        coin: new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xb45309, emissiveIntensity: 0.35, metalness: 0.65, roughness: 0.25 }),
+        wood: new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.85 }),
+        metal: new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.6, roughness: 0.35 }),
+        leaf: new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.85 }),
+        buildingWall1: new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.85 }),
+        buildingWall2: new THREE.MeshStandardMaterial({ color: 0xfed7aa, roughness: 0.85 }),
+        buildingRoof: new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.75 }),
+        windowGlass: new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.2, metalness: 0.4 })
+      };
+
+      // =========================================================
+      // 5. PROCEDURAL CHARACTERS (STUDENT & 4 PROFESSORS)
+      // =========================================================
+      // Helper: Smooth Capsule-like Limb (Cylinder + Spherical Joints)
+      function makeLimb(rTop, rBot, len, mat) {
+        const g = new THREE.Group();
+        const cyl = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, len, 14), mat);
+        cyl.position.y = -len / 2;
+        cyl.castShadow = true;
+        g.add(cyl);
+        const topCap = new THREE.Mesh(new THREE.SphereGeometry(rTop, 12, 10), mat);
+        g.add(topCap);
+        const botCap = new THREE.Mesh(new THREE.SphereGeometry(rBot, 12, 10), mat);
+        botCap.position.y = -len;
+        g.add(botCap);
+        return g;
+      }
+
+      // Build Skeletal AnimationClips for AnimationMixer (Idle, Run, Jump, Slide, Hit, Celebrate)
+      function createCharacterClips() {
+        const times = [0, 0.2, 0.4];
+        const runClip = new THREE.AnimationClip('Run', 0.4, [
+          new THREE.NumberKeyframeTrack('leftLeg.rotation[x]', times, [0.85, -0.85, 0.85]),
+          new THREE.NumberKeyframeTrack('rightLeg.rotation[x]', times, [-0.85, 0.85, -0.85]),
+          new THREE.NumberKeyframeTrack('leftArm.rotation[x]', times, [-0.75, 0.75, -0.75]),
+          new THREE.NumberKeyframeTrack('rightArm.rotation[x]', times, [0.75, -0.75, 0.75]),
+          new THREE.NumberKeyframeTrack('bodyPivot.position[y]', [0, 0.1, 0.2, 0.3, 0.4], [0, 0.1, 0, 0.1, 0]),
+          new THREE.NumberKeyframeTrack('bodyPivot.rotation[x]', [0, 0.4], [0.16, 0.16])
+        ]);
+        const idleClip = new THREE.AnimationClip('Idle', 1.0, [
+          new THREE.NumberKeyframeTrack('bodyPivot.position[y]', [0, 0.5, 1.0], [0, 0.04, 0]),
+          new THREE.NumberKeyframeTrack('leftArm.rotation[x]', [0, 0.5, 1.0], [0.05, -0.05, 0.05]),
+          new THREE.NumberKeyframeTrack('rightArm.rotation[x]', [0, 0.5, 1.0], [-0.05, 0.05, -0.05])
+        ]);
+        const jumpClip = new THREE.AnimationClip('Jump', 0.4, [
+          new THREE.NumberKeyframeTrack('leftArm.rotation[x]', [0, 0.4], [-1.35, -1.35]),
+          new THREE.NumberKeyframeTrack('rightArm.rotation[x]', [0, 0.4], [-1.35, -1.35]),
+          new THREE.NumberKeyframeTrack('leftLeg.rotation[x]', [0, 0.4], [0.65, 0.65]),
+          new THREE.NumberKeyframeTrack('rightLeg.rotation[x]', [0, 0.4], [-0.45, -0.45]),
+          new THREE.NumberKeyframeTrack('bodyPivot.rotation[x]', [0, 0.4], [-0.15, -0.15])
+        ]);
+        const slideClip = new THREE.AnimationClip('Slide', 0.4, [
+          new THREE.NumberKeyframeTrack('bodyPivot.rotation[x]', [0, 0.4], [1.15, 1.15]),
+          new THREE.NumberKeyframeTrack('bodyPivot.position[y]', [0, 0.4], [-0.62, -0.62]),
+          new THREE.NumberKeyframeTrack('leftLeg.rotation[x]', [0, 0.4], [-0.25, -0.25]),
+          new THREE.NumberKeyframeTrack('rightLeg.rotation[x]', [0, 0.4], [0.25, 0.25])
+        ]);
+        const celebrateClip = new THREE.AnimationClip('Celebrate', 0.8, [
+          new THREE.NumberKeyframeTrack('leftArm.rotation[x]', [0, 0.4, 0.8], [-2.8, -2.2, -2.8]),
+          new THREE.NumberKeyframeTrack('rightArm.rotation[x]', [0, 0.4, 0.8], [-2.8, -2.2, -2.8]),
+          new THREE.NumberKeyframeTrack('bodyPivot.position[y]', [0, 0.4, 0.8], [0, 0.85, 0])
+        ]);
+        return { Run: runClip, Idle: idleClip, Jump: jumpClip, Slide: slideClip, Celebrate: celebrateClip };
+      }
+      const CHAR_CLIPS = createCharacterClips();
+
+      // Optional GLTF/GLB External Model Loader Hook (for custom Mixamo/ReadyPlayerMe GLBs)
+      function loadGLTFCharacter(url, targetGroup) {
+        if (!window.THREE || !THREE.GLTFLoader) return;
+        const loader = new THREE.GLTFLoader();
+        loader.load(url, (gltf) => {
+          targetGroup.clear();
+          targetGroup.add(gltf.scene);
+        }, undefined, () => {});
+      }
+
+      function buildStudent() {
+        const root = new THREE.Group();
+        const bodyPivot = new THREE.Group();
+        bodyPivot.name = 'bodyPivot';
+        root.add(bodyPivot);
+
+        // Sculpted Torso (LatheGeometry with waist & chest taper)
+        const torsoPts = [
+          new THREE.Vector2(0.01, 0),
+          new THREE.Vector2(0.28, 0.05),
+          new THREE.Vector2(0.32, 0.35),
+          new THREE.Vector2(0.37, 0.72),
+          new THREE.Vector2(0.24, 0.9),
+          new THREE.Vector2(0.14, 0.96),
+          new THREE.Vector2(0.01, 0.96)
+        ];
+        const torso = new THREE.Mesh(new THREE.LatheGeometry(torsoPts, 18), MATS.shirt);
+        torso.scale.set(1.05, 1, 0.72);
+        torso.position.y = 0.88;
+        torso.castShadow = true;
+        bodyPivot.add(torso);
+
+        // Neck
+        const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.18, 12), MATS.skin);
+        neck.position.y = 1.84;
+        bodyPivot.add(neck);
+
+        // College ID Card lanyard & badge
+        const lanyard = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.022, 8, 18, Math.PI), new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.5 }));
+        lanyard.rotation.x = Math.PI;
+        lanyard.rotation.y = Math.PI / 2;
+        lanyard.position.set(0, 1.66, 0.16);
+        bodyPivot.add(lanyard);
+        const idCard = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.03), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 }));
+        idCard.position.set(0, 1.34, 0.27);
+        bodyPivot.add(idCard);
+        const idStripe = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.07, 0.035), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+        idStripe.position.set(0, 1.42, 0.27);
+        bodyPivot.add(idStripe);
+
+        // Rounded Ergonomic Backpack
+        const pack = new THREE.Mesh(new THREE.SphereGeometry(0.36, 16, 14), MATS.backpack);
+        pack.scale.set(0.95, 1.15, 0.62);
+        pack.position.set(0, 1.38, -0.34);
+        pack.castShadow = true;
+        bodyPivot.add(pack);
+        const packPocket = new THREE.Mesh(new THREE.SphereGeometry(0.24, 14, 10), new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 0.65 }));
+        packPocket.scale.set(1.0, 0.85, 0.45);
+        packPocket.position.set(0, 1.22, -0.52);
+        bodyPivot.add(packPocket);
+
+        // Smooth Stylized Head & Expressive Face
+        const head = new THREE.Group();
+        head.position.set(0, 2.14, 0);
+        const skull = new THREE.Mesh(new THREE.SphereGeometry(0.29, 22, 18), MATS.skin);
+        skull.scale.set(0.96, 1.08, 0.98);
+        skull.castShadow = true;
+        head.add(skull);
+
+        // Nose & Ears
+        const nose = new THREE.Mesh(new THREE.SphereGeometry(0.055, 10, 8), MATS.skin);
+        nose.position.set(0, -0.02, -0.28);
+        head.add(nose);
+        [-0.28, 0.28].forEach((ex) => {
+          const ear = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), MATS.skin);
+          ear.scale.set(0.6, 1.1, 0.8);
+          ear.position.set(ex, 0, 0);
+          head.add(ear);
+        });
+
+        // Sculpted Hair Cap + Swept Bangs
+        const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.305, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.58), MATS.hairDark);
+        hairCap.position.y = 0.03;
+        hairCap.rotation.x = -0.18;
+        head.add(hairCap);
+        const hairSwoop = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 10), MATS.hairDark);
+        hairSwoop.scale.set(1.5, 0.65, 0.9);
+        hairSwoop.position.set(0.04, 0.22, -0.2);
+        head.add(hairSwoop);
+
+        // Glossy Cartoon Eyes, Pupils, Brows & Mouth (facing -Z)
+        const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const pupilMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+        [-0.11, 0.11].forEach((ex) => {
+          const eye = new THREE.Mesh(new THREE.SphereGeometry(0.062, 12, 10), eyeMat);
+          eye.scale.set(1, 1.15, 0.5);
+          eye.position.set(ex, 0.04, -0.25);
+          head.add(eye);
+          const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.034, 10, 8), pupilMat);
+          pupil.position.set(ex, 0.04, -0.275);
+          head.add(pupil);
+          const brow = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.11, 8), MATS.hairDark);
+          brow.rotation.z = Math.PI / 2;
+          brow.position.set(ex, 0.13, -0.26);
+          head.add(brow);
+        });
+        const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.018, 8, 12, Math.PI), new THREE.MeshBasicMaterial({ color: 0x7f1d1d }));
+        mouth.rotation.z = Math.PI;
+        mouth.position.set(0, -0.11, -0.26);
+        head.add(mouth);
+        bodyPivot.add(head);
+
+        // Articulated Arms + Hands
+        const leftArm = new THREE.Group();
+        leftArm.name = 'leftArm';
+        leftArm.position.set(-0.42, 1.66, 0);
+        leftArm.add(makeLimb(0.11, 0.095, 0.3, MATS.shirt));
+        const lFore = makeLimb(0.08, 0.065, 0.36, MATS.skin);
+        lFore.position.y = -0.3;
+        leftArm.add(lFore);
+        const lHand = new THREE.Mesh(new THREE.SphereGeometry(0.085, 10, 8), MATS.skin);
+        lHand.position.y = -0.68;
+        leftArm.add(lHand);
+        bodyPivot.add(leftArm);
+
+        const rightArm = new THREE.Group();
+        rightArm.name = 'rightArm';
+        rightArm.position.set(0.42, 1.66, 0);
+        rightArm.add(makeLimb(0.11, 0.095, 0.3, MATS.shirt));
+        const rFore = makeLimb(0.08, 0.065, 0.36, MATS.skin);
+        rFore.position.y = -0.3;
+        rightArm.add(rFore);
+        const rHand = new THREE.Mesh(new THREE.SphereGeometry(0.085, 10, 8), MATS.skin);
+        rHand.position.y = -0.68;
+        rightArm.add(rHand);
+        bodyPivot.add(rightArm);
+
+        // Articulated Legs + Sculpted Athletic Sneakers
+        const shoeMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.45 });
+        function makeLeg(name, xPos) {
+          const leg = new THREE.Group();
+          leg.name = name;
+          leg.position.set(xPos, 0.9, 0);
+          leg.add(makeLimb(0.145, 0.11, 0.72, MATS.jeans));
+          const shoe = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 10), shoeMat);
+          shoe.scale.set(0.9, 0.65, 1.45);
+          shoe.position.set(0, -0.78, -0.06);
+          shoe.castShadow = true;
+          leg.add(shoe);
+          const sole = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.16, 0.06, 14), MATS.sneaker);
+          sole.scale.set(0.95, 1, 1.45);
+          sole.position.set(0, -0.84, -0.06);
+          leg.add(sole);
+          return leg;
+        }
+        const leftLeg = makeLeg('leftLeg', -0.18);
+        const rightLeg = makeLeg('rightLeg', 0.18);
+        bodyPivot.add(leftLeg);
+        bodyPivot.add(rightLeg);
+
+        // Graduation Mortarboard Cap (visible during Victory Cinematic)
+        const gradCap = new THREE.Group();
+        const capBase = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.3, 0.14, 14), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+        gradCap.add(capBase);
+        const capTop = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.05, 0.68), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+        capTop.position.y = 0.08;
+        gradCap.add(capTop);
+        const tassel = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.28, 6), new THREE.MeshBasicMaterial({ color: 0xfbbf24 }));
+        tassel.position.set(0.32, -0.04, 0.22);
+        gradCap.add(tassel);
+        gradCap.position.set(0, 0.32, 0);
+        gradCap.visible = false;
+        head.add(gradCap);
+
+        // Shield Visual Auras
+        const smartAura = new THREE.Mesh(
+          new THREE.SphereGeometry(1.35, 18, 14),
+          new THREE.MeshBasicMaterial({ color: 0x22d3ee, wireframe: true, transparent: true, opacity: 0.45 })
+        );
+        smartAura.position.y = 1.2;
+        smartAura.visible = false;
+        root.add(smartAura);
+
+        const attAura = new THREE.Mesh(
+          new THREE.TorusGeometry(1.15, 0.08, 10, 28),
+          new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.75 })
+        );
+        attAura.rotation.x = Math.PI / 2;
+        attAura.position.y = 0.2;
+        attAura.visible = false;
+        root.add(attAura);
+
+        // Setup AnimationMixer
+        const mixer = new THREE.AnimationMixer(root);
+        const actions = {
+          Idle: mixer.clipAction(CHAR_CLIPS.Idle),
+          Run: mixer.clipAction(CHAR_CLIPS.Run),
+          Jump: mixer.clipAction(CHAR_CLIPS.Jump),
+          Slide: mixer.clipAction(CHAR_CLIPS.Slide),
+          Celebrate: mixer.clipAction(CHAR_CLIPS.Celebrate)
+        };
+        actions.Run.play();
+
+        root.userData = { bodyPivot, head, leftArm, rightArm, leftLeg, rightLeg, pack, gradCap, smartAura, attAura, mixer, actions, activeAction: 'Run' };
+        return root;
+      }
+
+      function buildProfessor(type = 'math') {
+        const root = new THREE.Group();
+        const cfg = {
+          math: { coat: 0x92400e, pants: 0x1e293b, hair: 0x4b5563, glasses: true, scale: 1.0 },
+          physics: { coat: 0x4f46e5, pants: 0x111827, hair: 0xe5e7eb, glasses: true, scale: 1.04 },
+          lab: { coat: 0xf8fafc, pants: 0x334155, hair: 0x1f2937, glasses: true, scale: 1.02 },
+          hod: { coat: 0x7f1d1d, pants: 0x0f172a, hair: 0xd1d5db, glasses: true, scale: 1.18 }
+        }[type] || { coat: 0x92400e, pants: 0x1e293b, hair: 0x4b5563, glasses: true, scale: 1.0 };
+
+        const body = new THREE.Group();
+        body.name = 'bodyPivot';
+        root.add(body);
+
+        const coatMat = new THREE.MeshStandardMaterial({ color: cfg.coat, roughness: 0.65 });
+        const pantsMat = new THREE.MeshStandardMaterial({ color: cfg.pants, roughness: 0.75 });
+        const hairMat = new THREE.MeshStandardMaterial({ color: cfg.hair, roughness: 0.8 });
+
+        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.4, 0.96, 16), coatMat);
+        torso.scale.set(1.08, 1, 0.75);
+        torso.position.y = 1.38;
+        torso.castShadow = true;
+        body.add(torso);
+
+        const shirtFront = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.14, 0.7, 12), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+        shirtFront.position.set(0, 1.46, -0.24);
+        body.add(shirtFront);
+        if (type === 'hod' || type === 'math') {
+          const tie = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.48, 6), new THREE.MeshBasicMaterial({ color: type === 'hod' ? 0xfbbf24 : 0xef4444 }));
+          tie.rotation.x = Math.PI;
+          tie.position.set(0, 1.38, -0.32);
+          body.add(tie);
+        }
+
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.31, 20, 16), MATS.skin);
+        head.scale.set(0.98, 1.08, 0.98);
+        head.position.y = 2.18;
+        head.castShadow = true;
+        body.add(head);
+
+        const hair = new THREE.Mesh(new THREE.SphereGeometry(0.325, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.52), hairMat);
+        hair.position.y = 2.22;
+        body.add(hair);
+
+        if (type === 'physics') {
+          [-0.34, 0.34].forEach((tx) => {
+            const tuft = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), hairMat);
+            tuft.position.set(tx, 2.28, 0);
+            body.add(tuft);
+          });
+        }
+
+        // Spectacles & Angry Brows facing -Z
+        if (cfg.glasses) {
+          const rimMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7 });
+          const lensMat = new THREE.MeshStandardMaterial({ color: type === 'lab' ? 0x67e8f9 : 0xe0f2fe, roughness: 0.1, metalness: 0.2 });
+          [-0.12, 0.12].forEach((gx) => {
+            const rim = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.015, 8, 16), rimMat);
+            rim.position.set(gx, 2.18, -0.3);
+            body.add(rim);
+            const lens = new THREE.Mesh(new THREE.CircleGeometry(0.072, 12), lensMat);
+            lens.rotation.y = Math.PI;
+            lens.position.set(gx, 2.18, -0.305);
+            body.add(lens);
+          });
+        }
+
+        const browMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
+        [-1, 1].forEach((side) => {
+          const b = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.14, 8), browMat);
+          b.rotation.z = Math.PI / 2 + side * 0.3;
+          b.position.set(side * 0.12, 2.29, -0.3);
+          body.add(b);
+        });
+
+        const mouth = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), new THREE.MeshBasicMaterial({ color: 0x7f1d1d }));
+        mouth.scale.set(1.2, 0.7, 0.5);
+        mouth.position.set(0, 1.98, -0.29);
+        body.add(mouth);
+
+        if (type === 'math' || type === 'hod') {
+          const stache = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.24, 8), hairMat);
+          stache.rotation.z = Math.PI / 2;
+          stache.position.set(0, 2.06, -0.31);
+          body.add(stache);
+        }
+
+        const leftArm = new THREE.Group();
+        leftArm.name = 'leftArm';
+        leftArm.position.set(-0.48, 1.72, 0);
+        leftArm.add(makeLimb(0.11, 0.09, 0.65, coatMat));
+        body.add(leftArm);
+
+        const rightArm = new THREE.Group();
+        rightArm.name = 'rightArm';
+        rightArm.position.set(0.48, 1.72, 0);
+        rightArm.add(makeLimb(0.11, 0.09, 0.65, coatMat));
+        if (type === 'math') {
+          const ruler = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.72, 0.03), new THREE.MeshStandardMaterial({ color: 0xfbbf24 }));
+          ruler.position.set(0, -0.66, -0.25);
+          ruler.rotation.x = Math.PI / 3;
+          rightArm.add(ruler);
+        } else if (type === 'lab') {
+          const flask = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.15, 0.34, 12), new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 0.4 }));
+          flask.position.set(0, -0.66, -0.15);
+          rightArm.add(flask);
+        } else if (type === 'hod') {
+          const board = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.48, 0.05), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+          board.position.set(0, -0.66, -0.2);
+          rightArm.add(board);
+        }
+        body.add(rightArm);
+
+        const leftLeg = new THREE.Group();
+        leftLeg.name = 'leftLeg';
+        leftLeg.position.set(-0.2, 0.9, 0);
+        leftLeg.add(makeLimb(0.14, 0.11, 0.78, pantsMat));
+        body.add(leftLeg);
+
+        const rightLeg = new THREE.Group();
+        rightLeg.name = 'rightLeg';
+        rightLeg.position.set(0.2, 0.9, 0);
+        rightLeg.add(makeLimb(0.14, 0.11, 0.78, pantsMat));
+        body.add(rightLeg);
+
+        const mixer = new THREE.AnimationMixer(root);
+        const runAct = mixer.clipAction(CHAR_CLIPS.Run);
+        runAct.play();
+
+        root.scale.setScalar(cfg.scale);
+        root.userData = { body, leftArm, rightArm, leftLeg, rightLeg, type, mixer };
+        return root;
+      }
+
+      const student = buildStudent();
+      scene.add(student);
+
+      const professors = {
+        math: buildProfessor('math'),
+        physics: buildProfessor('physics'),
+        lab: buildProfessor('lab'),
+        hod: buildProfessor('hod')
+      };
+      let activeProf = professors.math;
+      Object.values(professors).forEach((p) => {
+        p.visible = false;
+        scene.add(p);
+      });
+      activeProf.visible = true;
+
+      // =========================================================
+      // 6. CAMPUS ENVIRONMENT (RECYCLED SEGMENTS + DISTANT GATE)
+      // =========================================================
+      const campusSegments = [];
+
+      function createTree(x, z) {
+        const g = new THREE.Group();
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.34, 2.4, 7), MATS.wood);
+        trunk.position.y = 1.2;
+        trunk.castShadow = true;
+        g.add(trunk);
+        const crown1 = new THREE.Mesh(new THREE.SphereGeometry(1.5, 14, 12), MATS.leaf);
+        crown1.position.y = 2.9;
+        crown1.castShadow = true;
+        g.add(crown1);
+        const crown2 = new THREE.Mesh(new THREE.SphereGeometry(1.1, 14, 10), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.82 }));
+        crown2.position.set(0.25, 3.9, -0.15);
+        crown2.castShadow = true;
+        g.add(crown2);
+        g.position.set(x, 0, z);
+        return g;
+      }
+
+      function createLampPost(x, z) {
+        const g = new THREE.Group();
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 4.6, 8), MATS.metal);
+        pole.position.y = 2.3;
+        g.add(pole);
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.1, 0.1), MATS.metal);
+        arm.position.set(x < 0 ? 0.45 : -0.45, 4.55, 0);
+        g.add(arm);
+        const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+        bulb.position.set(x < 0 ? 0.85 : -0.85, 4.4, 0);
+        g.add(bulb);
+        g.position.set(x, 0, z);
+        return g;
+      }
+
+      function createBench(x, z, rotY) {
+        const g = new THREE.Group();
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.14, 0.65), MATS.wood);
+        seat.position.y = 0.52;
+        g.add(seat);
+        const back = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.55, 0.12), MATS.wood);
+        back.position.set(0, 0.85, -0.26);
+        g.add(back);
+        [-0.85, 0.85].forEach((lx) => {
+          const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.5, 0.55), MATS.metal);
+          leg.position.set(lx, 0.25, 0);
+          g.add(leg);
+        });
+        g.position.set(x, 0, z);
+        g.rotation.y = rotY;
+        return g;
+      }
+
+      function createBuilding(x, z, w, h, d, isLab) {
+        const g = new THREE.Group();
+        const wall = new THREE.Mesh(
+          new THREE.BoxGeometry(w, h, d),
+          isLab ? MATS.buildingWall2 : MATS.buildingWall1
+        );
+        wall.position.y = h / 2;
+        wall.castShadow = true;
+        wall.receiveShadow = true;
+        g.add(wall);
+
+        const roof = new THREE.Mesh(new THREE.BoxGeometry(w + 0.6, 0.6, d + 0.6), MATS.buildingRoof);
+        roof.position.y = h + 0.3;
+        g.add(roof);
+
+        // Classroom / Lab entrance facing road
+        const doorX = x < 0 ? w / 2 + 0.05 : -w / 2 - 0.05;
+        const door = new THREE.Mesh(new THREE.BoxGeometry(0.15, 3.0, 2.2), new THREE.MeshStandardMaterial({ color: 0x451a03 }));
+        door.position.set(doorX, 1.5, 0);
+        g.add(door);
+
+        // Windows
+        for (let wy = 3.2; wy < h - 1; wy += 2.8) {
+          for (let wz = -d / 3; wz <= d / 3; wz += d / 3) {
+            const win = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.4, 1.6), MATS.windowGlass);
+            win.position.set(doorX, wy, wz);
+            g.add(win);
+          }
+        }
+
+        // Signboard on building
+        const sign = new THREE.Mesh(
+          new THREE.PlaneGeometry(4.4, 1.6),
+          new THREE.MeshBasicMaterial({ map: isLab ? TEXTURES.labSign : TEXTURES.campusMain })
+        );
+        sign.position.set(x < 0 ? w / 2 + 0.16 : -w / 2 - 0.16, 4.4, 0);
+        sign.rotation.y = x < 0 ? Math.PI / 2 : -Math.PI / 2;
+        g.add(sign);
+
+        g.position.set(x, 0, z);
+        return g;
+      }
+
+      function createNoticeBoard(x, z) {
+        const g = new THREE.Group();
+        const post1 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.5, 0.16), MATS.metal);
+        post1.position.set(-0.9, 1.25, 0);
+        g.add(post1);
+        const post2 = post1.clone();
+        post2.position.x = 0.9;
+        g.add(post2);
+        const board = new THREE.Mesh(
+          new THREE.BoxGeometry(2.3, 1.2, 0.12),
+          new THREE.MeshBasicMaterial({ map: TEXTURES.noticeBoard })
+        );
+        board.position.y = 2.1;
+        g.add(board);
+        g.position.set(x, 0, z);
+        g.rotation.y = x < 0 ? 0.45 : -0.45;
+        return g;
+      }
+
+      function buildCampusSegment(index) {
+        const seg = new THREE.Group();
+
+        // 3-lane road
+        const road = new THREE.Mesh(new THREE.BoxGeometry(9.4, 0.2, SEGMENT_LENGTH), MATS.road);
+        road.position.y = -0.1;
+        road.receiveShadow = true;
+        seg.add(road);
+
+        // Curbs & Sidewalks
+        [-5.6, 5.6].forEach((sx) => {
+          const sw = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.26, SEGMENT_LENGTH), MATS.sidewalk);
+          sw.position.set(sx, -0.05, 0);
+          sw.receiveShadow = true;
+          seg.add(sw);
+        });
+
+        // Grass lawns
+        [-18, 18].forEach((gx) => {
+          const gr = new THREE.Mesh(new THREE.BoxGeometry(22.8, 0.1, SEGMENT_LENGTH), MATS.grass);
+          gr.position.set(gx, -0.1, 0);
+          gr.receiveShadow = true;
+          seg.add(gr);
+        });
+
+        // Dashed lane markings
+        [-1.3, 1.3].forEach((lx) => {
+          for (let mz = -SEGMENT_LENGTH / 2 + 2.5; mz < SEGMENT_LENGTH / 2; mz += 6.5) {
+            const dash = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.03, 3.0), MATS.laneMark);
+            dash.position.set(lx, 0.01, mz);
+            seg.add(dash);
+          }
+        });
+
+        // Scenery per segment
+        const isLab = index % 2 === 1;
+        seg.add(createBuilding(-14.5, 0, 10, isLab ? 8.5 : 10.5, 16, isLab));
+        seg.add(createBuilding(14.5, 0, 10, isLab ? 10 : 8.2, 16, !isLab));
+
+        seg.add(createTree(-6.5, -8));
+        seg.add(createTree(6.5, 6));
+        seg.add(createLampPost(-5.2, 10));
+        seg.add(createLampPost(5.2, -10));
+        seg.add(createBench(-5.8, 6, Math.PI / 2));
+        seg.add(createBench(5.8, -6, -Math.PI / 2));
+
+        if (index % 2 === 0) {
+          seg.add(createNoticeBoard(-5.5, -1.5));
+        } else {
+          seg.add(createNoticeBoard(5.5, 1.5));
+        }
+
+        seg.position.z = -index * SEGMENT_LENGTH;
+        scene.add(seg);
+        campusSegments.push(seg);
+      }
+
+      for (let i = 0; i < NUM_SEGMENTS; i++) {
+        buildCampusSegment(i);
+      }
+
+      // Visible Distant College Gate
+      const distantGate = new THREE.Group();
+      const gPillarGeo = new THREE.BoxGeometry(1.8, 11, 1.8);
+      const gPillarMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.7 });
+      const lp = new THREE.Mesh(gPillarGeo, gPillarMat);
+      lp.position.set(-7.5, 5.5, 0);
+      distantGate.add(lp);
+      const rp = new THREE.Mesh(gPillarGeo, gPillarMat);
+      rp.position.set(7.5, 5.5, 0);
+      distantGate.add(rp);
+      const arch = new THREE.Mesh(new THREE.BoxGeometry(17.5, 2.6, 2.0), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+      arch.position.set(0, 10.2, 0);
+      distantGate.add(arch);
+      const archSign = new THREE.Mesh(
+        new THREE.PlaneGeometry(13, 2.0),
+        new THREE.MeshBasicMaterial({ map: TEXTURES.gradGate })
+      );
+      archSign.position.set(0, 10.2, 1.05);
+      distantGate.add(archSign);
+      const finishBanner = new THREE.Mesh(
+        new THREE.PlaneGeometry(9.4, 1.4),
+        new THREE.MeshBasicMaterial({ map: makeSignTexture('#0f172a', '#fde047', 'FINISH LINE', 'B.TECH GRADUATION', '#10b981') })
+      );
+      finishBanner.position.set(0, 0.03, 1.5);
+      finishBanner.rotation.x = -Math.PI / 2;
+      distantGate.add(finishBanner);
+      distantGate.position.set(0, 0, -145);
+      scene.add(distantGate);
+
+      // =========================================================
+      // 7. OBSTACLES, COINS, POWER-UPS & CONFETTI
+      // =========================================================
+      const activeObstacles = [];
+      const activeCoins = [];
+      const activePowerups = [];
+      const activeDistractions = [];
+      const confettiParticles = [];
+
+      function createObstacleMesh(type) {
+        const g = new THREE.Group();
+        let action = 'lane'; // 'jump', 'slide', 'lane'
+        let hitHalfW = 0.85;
+        let hitMinY = 0;
+        let hitMaxY = 2.0;
+
+        if (type === 'MIDSEM') {
+          action = 'jump';
+          hitMaxY = 1.25;
+          const board = new THREE.Mesh(
+            new THREE.BoxGeometry(2.1, 1.25, 0.35),
+            new THREE.MeshBasicMaterial({ map: TEXTURES.midSem })
+          );
+          board.position.y = 0.65;
+          board.castShadow = true;
+          g.add(board);
+        } else if (type === 'ENDSEM') {
+          action = 'lane';
+          hitMaxY = 2.8;
+          const barrier = new THREE.Mesh(
+            new THREE.BoxGeometry(2.2, 2.6, 0.5),
+            new THREE.MeshBasicMaterial({ map: TEXTURES.endSem })
+          );
+          barrier.position.y = 1.3;
+          barrier.castShadow = true;
+          g.add(barrier);
+          const beacon = new THREE.Mesh(
+            new THREE.SphereGeometry(0.24, 10, 10),
+            new THREE.MeshBasicMaterial({ color: 0xff2222 })
+          );
+          beacon.position.y = 2.8;
+          g.add(beacon);
+        } else if (type === 'VIVA') {
+          action = 'lane';
+          hitMaxY = 2.6;
+          const prof = buildProfessor('physics');
+          prof.rotation.y = Math.PI; // face student
+          g.add(prof);
+          const qBox = new THREE.Mesh(
+            new THREE.BoxGeometry(1.1, 0.6, 0.12),
+            new THREE.MeshBasicMaterial({ map: makeSignTexture('#fbbf24', '#0f172a', 'VIVA!', 'ANSWER NOW', '#ffffff') })
+          );
+          qBox.position.y = 3.0;
+          g.add(qBox);
+        } else if (type === 'PRACTICAL') {
+          action = 'jump';
+          hitMaxY = 1.15;
+          const table = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.85, 0.9), MATS.metal);
+          table.position.y = 0.42;
+          table.castShadow = true;
+          g.add(table);
+          const beaker1 = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.22, 0.55, 10),
+            new THREE.MeshStandardMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.85 })
+          );
+          beaker1.position.set(-0.45, 1.12, 0);
+          g.add(beaker1);
+          const scope = new THREE.Mesh(
+            new THREE.BoxGeometry(0.65, 0.48, 0.5),
+            new THREE.MeshStandardMaterial({ color: 0x0f172a })
+          );
+          scope.position.set(0.4, 1.08, 0);
+          g.add(scope);
+        } else if (type === 'ASSIGNMENT') {
+          action = 'lane';
+          hitMaxY = 2.5;
+          const colors = [0xef4444, 0x3b82f6, 0x10b981, 0xf59e0b, 0x8b5cf6];
+          for (let i = 0; i < 5; i++) {
+            const book = new THREE.Mesh(
+              new THREE.BoxGeometry(1.5 - i * 0.08, 0.42, 1.1),
+              new THREE.MeshStandardMaterial({ color: colors[i], roughness: 0.6 })
+            );
+            book.position.y = 0.22 + i * 0.44;
+            book.rotation.y = (i % 2 === 0 ? 0.12 : -0.14);
+            book.castShadow = true;
+            g.add(book);
+          }
+          g.userData.dropAnim = true;
+        } else if (type === 'ATTENDANCE') {
+          action = 'slide';
+          hitMinY = 1.05; // Student can slide under!
+          hitMaxY = 3.0;
+          [-0.95, 0.95].forEach((px) => {
+            const post = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.7, 0.2), MATS.metal);
+            post.position.set(px, 1.35, 0);
+            g.add(post);
+          });
+          const bar = new THREE.Mesh(
+            new THREE.BoxGeometry(2.25, 1.25, 0.28),
+            new THREE.MeshBasicMaterial({ map: TEXTURES.attendance })
+          );
+          bar.position.y = 1.95;
+          bar.castShadow = true;
+          g.add(bar);
+        } else if (type === 'PROJECT') {
+          action = 'jump';
+          hitMaxY = 1.2;
+          const file = new THREE.Mesh(
+            new THREE.BoxGeometry(1.9, 1.15, 0.75),
+            new THREE.MeshBasicMaterial({ map: TEXTURES.project })
+          );
+          file.position.y = 0.58;
+          file.castShadow = true;
+          g.add(file);
+        }
+
+        return { mesh: g, type, action, hitHalfW, hitMinY, hitMaxY, hit: false };
+      }
+
+      const coinGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.12, 16);
+      coinGeo.rotateX(Math.PI / 2);
+      const coinRimGeo = new THREE.TorusGeometry(0.42, 0.055, 8, 20);
+      const coinGlowGeo = new THREE.TorusGeometry(0.56, 0.03, 6, 18);
+      const coinGlowMat = new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.65 });
+
+      function spawnCoin(lane, y, z) {
+        const g = new THREE.Group();
+        const disc = new THREE.Mesh(coinGeo, MATS.coin);
+        g.add(disc);
+        const rim = new THREE.Mesh(coinRimGeo, new THREE.MeshStandardMaterial({ color: 0xfde047, metalness: 0.8, roughness: 0.2 }));
+        g.add(rim);
+        const glow = new THREE.Mesh(coinGlowGeo, coinGlowMat);
+        g.add(glow);
+        g.position.set(LANES[lane], y, z);
+        scene.add(g);
+        activeCoins.push({ mesh: g, lane, collected: false, baseY: y });
+      }
+
+      function spawnPowerup(type, lane, z) {
+        const g = new THREE.Group();
+        let color = 0xf59e0b;
+        if (type === 'COFFEE') {
+          color = 0x78350f;
+          const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.24, 0.65, 12), new THREE.MeshStandardMaterial({ color: 0xfef3c7 }));
+          g.add(cup);
+          const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.1, 12), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+          lid.position.y = 0.34;
+          g.add(lid);
+        } else if (type === 'SMART_NOTES') {
+          color = 0x22d3ee;
+          const book = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.75, 0.18), new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0891b2, emissiveIntensity: 0.4 }));
+          g.add(book);
+        } else if (type === 'ATTENDANCE_CARD') {
+          color = 0x10b981;
+          const card = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.5, 0.08), new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 0.4 }));
+          g.add(card);
+        }
+        const halo = new THREE.Mesh(
+          new THREE.TorusGeometry(0.58, 0.05, 8, 20),
+          new THREE.MeshBasicMaterial({ color })
+        );
+        g.add(halo);
+        g.position.set(LANES[lane], 1.15, z);
+        scene.add(g);
+        activePowerups.push({ mesh: g, type, lane, collected: false });
+      }
+
+      function spawnDistraction(type, lane, z) {
+        const g = new THREE.Group();
+        if (type === 'PHONE') {
+          const phone = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.86, 0.08), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3 }));
+          g.add(phone);
+          const screen = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.72, 0.09), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+          g.add(screen);
+          const badge = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+          badge.position.set(0.22, 0.38, 0.06);
+          g.add(badge);
+        } else if (type === 'HEART') {
+          const heartMat = new THREE.MeshStandardMaterial({ color: 0xec4899, emissive: 0xdb2777, emissiveIntensity: 0.45 });
+          const l1 = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 10), heartMat);
+          l1.position.set(-0.16, 0.14, 0);
+          g.add(l1);
+          const l2 = l1.clone();
+          l2.position.x = 0.16;
+          g.add(l2);
+          const tip = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.48, 8), heartMat);
+          tip.rotation.x = Math.PI;
+          tip.position.y = -0.14;
+          g.add(tip);
+        } else if (type === 'GAMING') {
+          const pad = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.42, 0.18), new THREE.MeshStandardMaterial({ color: 0x6d28d9, emissive: 0x4c1d95, emissiveIntensity: 0.4 }));
+          g.add(pad);
+          const btn1 = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshBasicMaterial({ color: 0x22d3ee }));
+          btn1.position.set(-0.24, 0.05, 0.1);
+          g.add(btn1);
+          const btn2 = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshBasicMaterial({ color: 0xf43f5e }));
+          btn2.position.set(0.24, 0.05, 0.1);
+          g.add(btn2);
+        } else if (type === 'SLEEP') {
+          const zMat = new THREE.MeshStandardMaterial({ color: 0x60a5fa, emissive: 0x2563eb, emissiveIntensity: 0.4 });
+          const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.44, 0.24), zMat);
+          g.add(pillow);
+          const zDot = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 0.08), new THREE.MeshBasicMaterial({ color: 0xe0f2fe }));
+          zDot.position.set(0.28, 0.38, 0);
+          g.add(zDot);
+        } else if (type === 'FRIEND') {
+          const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.2, 0.62, 10), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xea580c, emissiveIntensity: 0.3 }));
+          g.add(cup);
+          const tag = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.28, 0.06), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+          tag.position.y = 0.46;
+          g.add(tag);
+        } else if (type === 'STUDY_BOOK') {
+          const book = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.82, 0.22), new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 0.45 }));
+          g.add(book);
+          const halo = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.05, 8, 20), new THREE.MeshBasicMaterial({ color: 0x34d399 }));
+          g.add(halo);
+        }
+        g.position.set(LANES[lane], 1.15, z);
+        scene.add(g);
+        activeDistractions.push({ mesh: g, type, lane, collected: false });
+      }
+
+      function triggerConfetti() {
+        const colors = [0xff6b2b, 0xffd13b, 0x22d3ee, 0x10b981, 0xf43f5e];
+        const geo = new THREE.BoxGeometry(0.18, 0.18, 0.06);
+        for (let i = 0; i < 65; i++) {
+          const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: colors[i % colors.length] }));
+          m.position.set((Math.random() - 0.5) * 8, 5 + Math.random() * 4, -2 - Math.random() * 6);
+          m.userData = {
+            vx: (Math.random() - 0.5) * 4,
+            vy: 2 + Math.random() * 4,
+            vz: (Math.random() - 0.5) * 4,
+            vr: (Math.random() - 0.5) * 8
+          };
+          scene.add(m);
+          confettiParticles.push(m);
+        }
+      }
+
+      function triggerCrashExplosion(x, y, z) {
+        const colors = [0xef4444, 0xf97316, 0xfbbf24, 0xffffff, 0x991b1b];
+        const geo = new THREE.BoxGeometry(0.28, 0.28, 0.28);
+        for (let i = 0; i < 48; i++) {
+          const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: colors[i % colors.length] }));
+          m.position.set(x + (Math.random() - 0.5) * 0.8, y + 0.8 + Math.random() * 0.8, z);
+          m.userData = {
+            vx: (Math.random() - 0.5) * 14,
+            vy: 4 + Math.random() * 10,
+            vz: (Math.random() - 0.5) * 12,
+            vr: (Math.random() - 0.5) * 18
+          };
+          scene.add(m);
+          confettiParticles.push(m);
+        }
+      }
+
+      function triggerFireworks() {
+        const colors = [0xff6b2b, 0xffd13b, 0x22d3ee, 0x10b981, 0xec4899, 0xffffff];
+        const geo = new THREE.SphereGeometry(0.14, 6, 6);
+        [[-4, 7, -8], [4, 7.5, -10], [0, 8.5, -12]].forEach(([bx, by, bz]) => {
+          for (let i = 0; i < 24; i++) {
+            const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: colors[i % colors.length] }));
+            m.position.set(bx, by, bz);
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+            const spd = 4 + Math.random() * 6;
+            m.userData = {
+              vx: Math.sin(phi) * Math.cos(theta) * spd,
+              vy: Math.cos(phi) * spd + 2,
+              vz: Math.sin(phi) * Math.sin(theta) * spd,
+              vr: 4
+            };
+            scene.add(m);
+            confettiParticles.push(m);
+          }
+        });
+      }
+
+      // =========================================================
+      // 8. GAME STATE & LOGIC
+      // =========================================================
+      const state = {
+        mode: 'START', // START, PLAYING, PAUSED, GAMEOVER, GRADUATED
+        score: 0,
+        credits: 0,
+        distance: 0,
+        highScore: 0,
+        semesterIdx: 0,
+        endlessMode: false,
+        finaleActive: false,
+        victoryTimer: 0,
+
+        // Player physics
+        lane: 1,
+        targetX: 0,
+        playerX: 0,
+        playerY: 0,
+        vy: 0,
+        isJumping: false,
+        slideTimer: 0,
+        stumbleTimer: 0,
+        crashTimer: 0,
+        runTime: 0,
+
+        // Professor chase (distance behind player: 3.0 = caught, 10.5 = safe)
+        profDist: 7.5,
+        speed: 16.5,
+        spawnTimer: 0,
+        quoteTimer: 6,
+
+        // Powerups
+        coffeeTimer: 0,
+        smartNotes: false,
+        attendanceTimer: 0,
+        focus: 100,
+        attendance: 82,
+        distractType: null,
+        distractTimer: 0,
+        lowAttendanceWarned: false
+      };
+
+      // Load High Score safely
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('backlog_breaker_high_score_v1');
+        if (saved) state.highScore = parseInt(saved, 10) || 0;
+      } catch (e) {}
+
+      // DOM References
+      const els = {
+        hud: document.getElementById('hud'),
+        score: document.getElementById('hud-score'),
+        dist: document.getElementById('hud-distance'),
+        credits: document.getElementById('hud-credits'),
+        sem: document.getElementById('hud-sem'),
+        semBar: document.getElementById('hud-sem-bar'),
+        chaseDot: document.getElementById('chase-dot'),
+        chaseLabel: document.getElementById('chase-label'),
+        powerupBar: document.getElementById('powerup-bar'),
+        focusVal: document.getElementById('hud-focus-val'),
+        focusBar: document.getElementById('hud-focus-bar'),
+        attVal: document.getElementById('hud-att-val'),
+        attBar: document.getElementById('hud-att-bar'),
+        dreamOverlay: document.getElementById('dream-overlay'),
+        sleepOverlay: document.getElementById('sleep-overlay'),
+        toast: document.getElementById('toast-banner'),
+        toastTitle: document.getElementById('toast-title'),
+        toastSub: document.getElementById('toast-sub'),
+        vignette: document.getElementById('danger-vignette'),
+        crashFlash: document.getElementById('crash-flash'),
+        mobileControls: document.getElementById('mobile-controls'),
+
+        screenStart: document.getElementById('screen-start'),
+        screenPause: document.getElementById('screen-pause'),
+        screenGameover: document.getElementById('screen-gameover'),
+        startBest: document.getElementById('start-best'),
+        goBadge: document.getElementById('go-badge'),
+        goTitle: document.getElementById('go-title'),
+        goMessage: document.getElementById('go-message'),
+        goScore: document.getElementById('go-score'),
+        goCredits: document.getElementById('go-credits'),
+        goSem: document.getElementById('go-sem'),
+        goBest: document.getElementById('go-best'),
+        btnContinueEndless: document.getElementById('btn-continue-endless'),
+        btnSoundHud: document.getElementById('btn-sound-hud'),
+        btnSoundStart: document.getElementById('btn-sound-start'),
+        btnTouchToggle: document.getElementById('btn-touch-toggle')
+      };
+      els.startBest.textContent = state.highScore;
+
+      let toastTimeout = null;
+      function showToast(title, sub, duration = 2600) {
+        els.toastTitle.textContent = title;
+        els.toastSub.textContent = sub;
+        els.toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => els.toast.classList.remove('show'), duration);
+      }
+
+      function setActiveProfessor(profKey) {
+        Object.entries(professors).forEach(([k, p]) => {
+          p.visible = (k === profKey);
+        });
+        activeProf = professors[profKey] || professors.math;
+      }
+
+      function clearEntities() {
+        activeObstacles.forEach((o) => scene.remove(o.mesh));
+        activeObstacles.length = 0;
+        activeCoins.forEach((c) => scene.remove(c.mesh));
+        activeCoins.length = 0;
+        activePowerups.forEach((p) => scene.remove(p.mesh));
+        activePowerups.length = 0;
+        activeDistractions.forEach((d) => scene.remove(d.mesh));
+        activeDistractions.length = 0;
+        confettiParticles.forEach((c) => scene.remove(c));
+        confettiParticles.length = 0;
+      }
+
+      function resetGame() {
+        clearEntities();
+        state.score = 0;
+        state.credits = 0;
+        state.distance = 0;
+        state.semesterIdx = 0;
+        state.endlessMode = false;
+        state.finaleActive = false;
+        state.victoryTimer = 0;
+        student.userData.gradCap.visible = false;
+
+        state.lane = 1;
+        state.targetX = LANES[1];
+        state.playerX = 0;
+        state.playerY = 0;
+        state.vy = 0;
+        state.isJumping = false;
+        state.slideTimer = 0;
+        state.stumbleTimer = 0;
+        state.crashTimer = 0;
+        state.runTime = 0;
+
+        state.profDist = 7.8;
+        state.speed = SEMESTERS[0].speed;
+        state.spawnTimer = 0.8;
+        state.quoteTimer = 6.5;
+
+        state.coffeeTimer = 0;
+        state.smartNotes = false;
+        state.attendanceTimer = 0;
+        state.focus = 100;
+        state.attendance = 82;
+        state.distractType = null;
+        state.distractTimer = 0;
+        state.lowAttendanceWarned = false;
+        els.dreamOverlay.classList.remove('active');
+        els.sleepOverlay.classList.remove('active');
+
+        student.position.set(0, 0, 0);
+        student.rotation.set(0, 0, 0);
+        student.userData.bodyPivot.rotation.set(0, 0, 0);
+        student.userData.smartAura.visible = false;
+        student.userData.attAura.visible = false;
+
+        setActiveProfessor('math');
+        distantGate.position.z = -145;
+        els.vignette.classList.remove('active');
+        els.crashFlash.classList.remove('active');
+        els.goTitle.classList.remove('fail-title');
+        els.screenGameover.querySelector('.modal-card').classList.remove('fail-shake');
+        updateHUD();
+      }
+
+      function startGame() {
+        SoundFX.init();
+        resetGame();
+        state.mode = 'PLAYING';
+        els.screenStart.classList.add('hidden');
+        els.screenPause.classList.add('hidden');
+        els.screenGameover.classList.add('hidden');
+        els.hud.style.display = 'block';
+        updateTouchVisibility();
+        showToast('Semester 1: Welcome to Engineering', 'Attendance is below 75%! RUN!', 2800);
+      }
+
+      function pauseGame() {
+        if (state.mode !== 'PLAYING') return;
+        state.mode = 'PAUSED';
+        els.screenPause.classList.remove('hidden');
+      }
+
+      function resumeGame() {
+        if (state.mode !== 'PAUSED') return;
+        state.mode = 'PLAYING';
+        els.screenPause.classList.add('hidden');
+        lastTime = performance.now();
+      }
+
+      function saveHighScore() {
+        const finalScore = Math.floor(state.score);
+        if (finalScore > state.highScore) {
+          state.highScore = finalScore;
+          try { localStorage.setItem(STORAGE_KEY, String(state.highScore)); } catch (e) {}
+        }
+        els.startBest.textContent = state.highScore;
+      }
+
+      function triggerFailCrash(obs) {
+        state.mode = 'CRASHING';
+        state.crashTimer = 0.9;
+        SoundFX.failCrash();
+        triggerCrashExplosion(student.position.x, student.position.y, 0);
+        els.crashFlash.classList.add('active');
+        setTimeout(() => els.crashFlash.classList.remove('active'), 180);
+        showToast('💥 CRASH!', 'FAIL (BACK YEAR)!', 1100);
+      }
+
+      function triggerGameOver() {
+        state.mode = 'GAMEOVER';
+        saveHighScore();
+        els.vignette.classList.remove('active');
+        els.hud.style.display = 'none';
+        els.mobileControls.classList.remove('visible');
+
+        const sem = SEMESTERS[state.semesterIdx];
+        document.querySelectorAll('.finale-stat').forEach((el) => { el.style.display = 'none'; });
+        els.goBadge.textContent = 'YEAR BACK!';
+        els.goTitle.textContent = 'FAIL (BACK YEAR)';
+        els.goTitle.classList.add('fail-title');
+        els.screenGameover.querySelector('.modal-card').classList.add('fail-shake');
+        els.goMessage.textContent = GAMEOVER_MESSAGES[Math.floor(Math.random() * GAMEOVER_MESSAGES.length)];
+        els.goScore.textContent = Math.floor(state.score);
+        els.goCredits.textContent = state.credits;
+        els.goSem.textContent = `Sem ${sem.num}`;
+        els.goBest.textContent = state.highScore;
+        els.btnContinueEndless.style.display = 'none';
+        els.screenGameover.classList.remove('hidden');
+      }
+
+      function startVictoryCinematic() {
+        state.mode = 'VICTORY_CINEMATIC';
+        state.victoryTimer = 2.0;
+        student.userData.gradCap.visible = true;
+        SoundFX.cheering();
+        triggerConfetti();
+        triggerFireworks();
+        els.vignette.classList.remove('active');
+        els.hud.style.display = 'none';
+        els.mobileControls.classList.remove('visible');
+        showToast('🎓 FINISH LINE CROSSED!', 'CONGRATULATIONS! ENGINEER GRADUATED!', 2200);
+      }
+
+      function computeRating() {
+        const pts = state.score + state.credits * 20 + state.attendance * 8 + state.focus * 6;
+        if (pts >= 5600) return 'S+ • Gold Medalist';
+        if (pts >= 4500) return 'A+ • Distinction';
+        if (pts >= 3600) return 'B+ • First Class';
+        return 'C • Survivor Engineer';
+      }
+
+      function triggerGraduation() {
+        state.mode = 'GRADUATED';
+        saveHighScore();
+        els.vignette.classList.remove('active');
+        els.hud.style.display = 'none';
+        els.mobileControls.classList.remove('visible');
+
+        document.querySelectorAll('.finale-stat').forEach((el) => { el.style.display = 'block'; });
+        els.goBadge.textContent = '🎓 GRADUATION FINALE CLEARED!';
+        els.goTitle.textContent = 'CONGRATULATIONS! ENGINEER GRADUATED!';
+        els.goTitle.classList.remove('fail-title');
+        els.goMessage.textContent = 'You escaped the HOD Boss and crossed the Graduation Finish Line with ZERO Backlogs!';
+        els.goScore.textContent = Math.floor(state.score);
+        els.goCredits.textContent = state.credits;
+        els.goSem.textContent = '8 / 8 + Finale';
+        els.goBest.textContent = state.highScore;
+        document.getElementById('go-att-focus').textContent = `${Math.round(state.attendance)}% / ${Math.round(state.focus)}%`;
+        document.getElementById('go-rating').textContent = `0 • ${computeRating()}`;
+        els.btnContinueEndless.style.display = 'block';
+        els.screenGameover.classList.remove('hidden');
+      }
+
+      // =========================================================
+      // 9. OBSTACLE & COLLECTIBLE SPAWNER (ALWAYS FAIR)
+      // =========================================================
+      function getAllowedObstacles() {
+        const s = state.semesterIdx + 1;
+        const pool = ['MIDSEM', 'ASSIGNMENT'];
+        if (s >= 2) pool.push('ATTENDANCE', 'PROJECT');
+        if (s >= 3) pool.push('ENDSEM');
+        if (s >= 4) pool.push('VIVA');
+        if (s >= 5) pool.push('PRACTICAL');
+        return pool;
+      }
+
+      function spawnWave() {
+        const pool = getAllowedObstacles();
+        const zBase = -125;
+
+        // Guarantee at least 1 lane is ALWAYS open or passable
+        const count = Math.random() < (0.35 + state.semesterIdx * 0.06) ? 2 : 1;
+        const lanes = [0, 1, 2].sort(() => Math.random() - 0.5);
+        const chosenLanes = lanes.slice(0, count);
+
+        chosenLanes.forEach((laneIdx) => {
+          const type = pool[Math.floor(Math.random() * pool.length)];
+          const obs = createObstacleMesh(type);
+          const startY = obs.mesh.userData.dropAnim ? 5.5 : 0;
+          obs.mesh.position.set(LANES[laneIdx], startY, zBase);
+          obs.lane = laneIdx;
+          scene.add(obs.mesh);
+          activeObstacles.push(obs);
+
+          // Put bonus coin arc over jumpable obstacles occasionally
+          if (obs.action === 'jump' && Math.random() < 0.55) {
+            spawnCoin(laneIdx, 2.3, zBase);
+          }
+        });
+
+        // Open lane gets coins or a power-up!
+        const openLane = lanes[count] !== undefined ? lanes[count] : lanes[2];
+        const roll = Math.random();
+        if (roll < 0.14) {
+          const puTypes = ['COFFEE', 'SMART_NOTES', 'ATTENDANCE_CARD'];
+          const pu = puTypes[Math.floor(Math.random() * puTypes.length)];
+          spawnPowerup(pu, openLane, zBase - 3);
+        } else if (roll < 0.34) {
+          const dTypes = ['PHONE', 'HEART', 'GAMING', 'SLEEP', 'FRIEND', 'STUDY_BOOK'];
+          const dtPick = dTypes[Math.floor(Math.random() * dTypes.length)];
+          spawnDistraction(dtPick, openLane, zBase - 2);
+        } else if (roll < 0.85) {
+          const coinCount = 3 + Math.floor(Math.random() * 3);
+          for (let i = 0; i < coinCount; i++) {
+            spawnCoin(openLane, 0.95, zBase - i * 3.0);
+          }
+        }
+      }
+
+      // =========================================================
+      // 10. PLAYER CONTROLS (KEYBOARD, SWIPE, MOBILE BUTTONS)
+      // =========================================================
+      function moveLeft() {
+        if (state.mode !== 'PLAYING') return;
+        if (state.lane > 0) {
+          state.lane--;
+          state.targetX = LANES[state.lane];
+          SoundFX.lane();
+        }
+      }
+
+      function moveRight() {
+        if (state.mode !== 'PLAYING') return;
+        if (state.lane < 2) {
+          state.lane++;
+          state.targetX = LANES[state.lane];
+          SoundFX.lane();
+        }
+      }
+
+      function doJump() {
+        if (state.mode !== 'PLAYING') return;
+        if (!state.isJumping) {
+          state.isJumping = true;
+          state.vy = 13.8;
+          state.slideTimer = 0;
+          SoundFX.jump();
+        }
+      }
+
+      function doSlide() {
+        if (state.mode !== 'PLAYING') return;
+        if (state.isJumping) {
+          // Fast fall into slide
+          state.vy = -22;
+        }
+        state.slideTimer = 0.72;
+        SoundFX.slide();
+      }
+
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveLeft();
+        else if (e.code === 'ArrowRight' || e.code === 'KeyD') moveRight();
+        else if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') {
+          e.preventDefault();
+          doJump();
+        } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+          e.preventDefault();
+          doSlide();
+        } else if (e.code === 'KeyP' || e.code === 'Escape') {
+          if (state.mode === 'PLAYING') pauseGame();
+          else if (state.mode === 'PAUSED') resumeGame();
+        }
+      });
+
+      // Touch Swipe Detection
+      let touchStartX = 0;
+      let touchStartY = 0;
+      renderer.domElement.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 0) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      renderer.domElement.addEventListener('touchend', (e) => {
+        if (state.mode !== 'PLAYING' || e.changedTouches.length === 0) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        const absX = Math.abs(dx);
+        const absY = Math.abs(dy);
+        if (Math.max(absX, absY) < 24) return;
+        if (absX > absY) {
+          if (dx < 0) moveLeft();
+          else moveRight();
+        } else {
+          if (dy < 0) doJump();
+          else doSlide();
+        }
+      }, { passive: true });
+
+      // Mobile Control Buttons
+      document.getElementById('m-left').addEventListener('click', moveLeft);
+      document.getElementById('m-right').addEventListener('click', moveRight);
+      document.getElementById('m-up').addEventListener('click', doJump);
+      document.getElementById('m-down').addEventListener('click', doSlide);
+
+      let forceTouchMode = 'auto';
+      function updateTouchVisibility() {
+        const isCoarse = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+        const show = state.mode === 'PLAYING' && (forceTouchMode === 'on' || (forceTouchMode === 'auto' && isCoarse));
+        els.mobileControls.classList.toggle('visible', show);
+      }
+
+      // UI Button Bindings
+      document.getElementById('btn-start').addEventListener('click', startGame);
+      document.getElementById('btn-pause').addEventListener('click', pauseGame);
+      document.getElementById('btn-resume').addEventListener('click', resumeGame);
+      document.getElementById('btn-restart-pause').addEventListener('click', startGame);
+      document.getElementById('btn-play-again').addEventListener('click', startGame);
+      document.getElementById('btn-main-menu').addEventListener('click', () => {
+        resetGame();
+        state.mode = 'START';
+        els.screenGameover.classList.add('hidden');
+        els.screenStart.classList.remove('hidden');
+      });
+      els.btnContinueEndless.addEventListener('click', () => {
+        state.endlessMode = true;
+        state.mode = 'PLAYING';
+        els.screenGameover.classList.add('hidden');
+        els.hud.style.display = 'block';
+        updateTouchVisibility();
+        showToast('ALUMNI ENDLESS MODE', 'Keep running for the all-time high score!', 2400);
+        lastTime = performance.now();
+      });
+
+      function toggleSound() {
+        SoundFX.enabled = !SoundFX.enabled;
+        els.btnSoundHud.textContent = SoundFX.enabled ? '🔊' : '🔇';
+        els.btnSoundStart.textContent = SoundFX.enabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+      }
+      els.btnSoundHud.addEventListener('click', toggleSound);
+      els.btnSoundStart.addEventListener('click', toggleSound);
+
+      els.btnTouchToggle.addEventListener('click', () => {
+        forceTouchMode = forceTouchMode === 'auto' ? 'on' : forceTouchMode === 'on' ? 'off' : 'auto';
+        els.btnTouchToggle.textContent = `🎮 Touch Buttons: ${forceTouchMode.toUpperCase()}`;
+        updateTouchVisibility();
+      });
+
+      // =========================================================
+      // 11. HUD UPDATE & MAIN ANIMATION LOOP
+      // =========================================================
+      function updateHUD() {
+        els.score.textContent = Math.floor(state.score);
+        els.dist.textContent = `${Math.floor(state.distance)} m`;
+        els.credits.textContent = state.credits;
+
+        const sem = SEMESTERS[state.semesterIdx];
+        const nextDist = state.semesterIdx < SEMESTERS.length - 1
+          ? SEMESTERS[state.semesterIdx + 1].dist
+          : GRADUATION_DISTANCE;
+        const prevDist = sem.dist;
+        const pct = state.endlessMode
+          ? 100
+          : Math.min(100, Math.max(0, ((state.distance - prevDist) / (nextDist - prevDist)) * 100));
+
+        els.sem.textContent = state.endlessMode ? 'Alumni Endless Mode' : state.finaleActive ? '🎓 GRADUATION FINALE: Escape HOD!' : `Sem ${sem.num}: ${sem.name}`;
+        els.semBar.style.width = `${pct}%`;
+
+        // Chase meter
+        if (state.profDist < 4.8) {
+          els.chaseDot.style.background = '#ef4444';
+          els.chaseDot.style.boxShadow = '0 0 10px #ef4444';
+          els.chaseLabel.textContent = 'Prof Distance: DANGER!';
+          els.vignette.classList.add('active');
+        } else if (state.profDist < 6.8) {
+          els.chaseDot.style.background = '#f59e0b';
+          els.chaseDot.style.boxShadow = '0 0 8px #f59e0b';
+          els.chaseLabel.textContent = 'Prof Distance: Close';
+          els.vignette.classList.remove('active');
+        } else {
+          els.chaseDot.style.background = '#10b981';
+          els.chaseDot.style.boxShadow = '0 0 8px #10b981';
+          els.chaseLabel.textContent = 'Prof Distance: Safe';
+          els.vignette.classList.remove('active');
+        }
+
+        // Focus & Attendance meters
+        const fVal = Math.round(state.focus);
+        const aVal = Math.round(state.attendance);
+        els.focusVal.textContent = `${fVal}%`;
+        els.focusBar.style.width = `${fVal}%`;
+        els.focusBar.style.background = fVal < 40 ? '#ef4444' : fVal < 70 ? '#f59e0b' : '#38bdf8';
+
+        els.attVal.textContent = `${aVal}%`;
+        els.attBar.style.width = `${aVal}%`;
+        els.attBar.style.background = aVal < 75 ? '#ef4444' : '#10b981';
+
+        // Powerup & Distraction badges
+        let puHTML = '';
+        if (state.coffeeTimer > 0) {
+          puHTML += `<div class="pu-badge">☕ Coffee Boost <span class="pu-timer">${state.coffeeTimer.toFixed(1)}s</span></div>`;
+        }
+        if (state.smartNotes) {
+          puHTML += `<div class="pu-badge" style="border-color:#22d3ee;">📘 Smart Notes Shield <span class="pu-timer">READY</span></div>`;
+        }
+        if (state.attendanceTimer > 0) {
+          puHTML += `<div class="pu-badge" style="border-color:#10b981;">🪪 75%+ Attendance <span class="pu-timer">${state.attendanceTimer.toFixed(1)}s</span></div>`;
+        }
+        if (state.distractTimer > 0 && state.distractType) {
+          const labels = {
+            PHONE: '📱 Phone Distraction',
+            HEART: '💘 Daydreaming',
+            GAMING: '🎮 Gaming Mode',
+            SLEEP: '😴 Sleepy!',
+            FRIEND: '☕ Friend Bunking'
+          };
+          puHTML += `<div class="pu-badge" style="border-color:#f43f5e;">${labels[state.distractType] || 'Distracted'} <span class="pu-timer">${state.distractTimer.toFixed(1)}s</span></div>`;
+        }
+        els.powerupBar.innerHTML = puHTML;
+      }
+
+      function switchStudentAnim(name) {
+        const u = student.userData;
+        if (u.activeAction === name || !u.actions[name]) return;
+        const prev = u.actions[u.activeAction];
+        const next = u.actions[name];
+        next.reset().play();
+        if (prev) prev.crossFadeTo(next, 0.12, true);
+        u.activeAction = name;
+      }
+
+      function animateCharacters(dt, effSpeed) {
+        const u = student.userData;
+        state.runTime += dt * (effSpeed * 0.55);
+        const s = state.runTime;
+
+        if (state.mode === 'GRADUATED' || state.mode === 'VICTORY_CINEMATIC') {
+          switchStudentAnim('Celebrate');
+          u.mixer.update(dt);
+          return;
+        }
+        if (state.mode === 'START') {
+          switchStudentAnim('Idle');
+          u.mixer.update(dt);
+          return;
+        }
+
+        if (state.slideTimer > 0) {
+          switchStudentAnim('Slide');
+        } else if (state.isJumping) {
+          switchStudentAnim('Jump');
+        } else {
+          switchStudentAnim('Run');
+        }
+
+        u.mixer.timeScale = Math.max(0.8, effSpeed / 16.5);
+        u.mixer.update(dt);
+
+        if (state.stumbleTimer > 0) {
+          u.bodyPivot.rotation.z = Math.sin(state.stumbleTimer * 28) * 0.35;
+        } else {
+          u.bodyPivot.rotation.z = (student.position.x - state.targetX) * 0.14;
+        }
+
+        if (state.distractTimer > 0) {
+          if (state.distractType === 'PHONE') {
+            u.head.rotation.x = 0.35;
+          } else if (state.distractType === 'HEART') {
+            u.head.rotation.z = Math.sin(s * 2.5) * 0.25;
+          } else if (state.distractType === 'SLEEP') {
+            u.head.rotation.x = 0.45 + Math.sin(s * 1.5) * 0.15;
+          } else {
+            u.head.rotation.set(0, 0, 0);
+          }
+        } else {
+          u.head.rotation.set(0, 0, 0);
+        }
+
+        u.smartAura.visible = state.smartNotes;
+        u.smartAura.rotation.y += dt * 2.5;
+        u.attAura.visible = state.attendanceTimer > 0;
+        u.attAura.rotation.z += dt * 3.5;
+
+        // Animate chasing professor via AnimationMixer
+        const pu = activeProf.userData;
+        if (pu.mixer) {
+          pu.mixer.timeScale = Math.max(0.9, effSpeed / 15.5);
+          pu.mixer.update(dt);
+        }
+        activeProf.position.x += (student.position.x - activeProf.position.x) * Math.min(1, dt * 6);
+        activeProf.position.z = state.profDist;
+      }
+
+      let lastTime = performance.now();
+      function loop(now) {
+        requestAnimationFrame(loop);
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        // Update confetti even on graduation screen
+        for (let i = confettiParticles.length - 1; i >= 0; i--) {
+          const c = confettiParticles[i];
+          c.position.x += c.userData.vx * dt;
+          c.position.y += c.userData.vy * dt;
+          c.position.z += c.userData.vz * dt;
+          c.userData.vy -= 9.8 * dt;
+          c.rotation.x += c.userData.vr * dt;
+          c.rotation.y += c.userData.vr * dt;
+          if (c.position.y < -1) {
+            scene.remove(c);
+            confettiParticles.splice(i, 1);
+          }
+        }
+
+        if (state.mode === 'START') {
+          // Idle campus camera & gentle student run preview
+          animateCharacters(dt, 10);
+          camera.position.set(Math.sin(now * 0.0004) * 1.5, 4.6, 8.8);
+          camera.lookAt(0, 1.8, -6);
+          renderer.render(scene, camera);
+          return;
+        }
+
+        if (state.mode === 'VICTORY_CINEMATIC') {
+          state.victoryTimer -= dt;
+          animateCharacters(dt, 10);
+          camera.position.x = student.position.x * 0.5 + Math.sin(now * 0.004) * 2.2;
+          camera.position.y = 3.2;
+          camera.position.z = 5.2;
+          camera.lookAt(student.position.x, 1.5, 0);
+          renderer.render(scene, camera);
+          if (state.victoryTimer <= 0) {
+            triggerGraduation();
+          }
+          return;
+        }
+
+        if (state.mode === 'CRASHING') {
+          state.crashTimer -= dt;
+          // Student tumbles & stops dead; professor rushes in; camera shakes wildly
+          student.userData.bodyPivot.rotation.x = -1.35;
+          student.userData.bodyPivot.rotation.z += dt * 10;
+          student.position.y = Math.max(0.25, student.position.y - dt * 4);
+          activeProf.position.z = Math.max(1.4, activeProf.position.z - dt * 10);
+          camera.position.x = student.position.x * 0.55 + (Math.random() - 0.5) * 0.85;
+          camera.position.y = 4.5 + (Math.random() - 0.5) * 0.7;
+          camera.lookAt(student.position.x, 1.2, 0);
+          renderer.render(scene, camera);
+          if (state.crashTimer <= 0) {
+            triggerGameOver();
+          }
+          return;
+        }
+
+        if (state.mode !== 'PLAYING') {
+          if (state.mode === 'GRADUATED') animateCharacters(dt, 10);
+          renderer.render(scene, camera);
+          return;
+        }
+
+        // Powerup timers
+        if (state.coffeeTimer > 0) state.coffeeTimer = Math.max(0, state.coffeeTimer - dt);
+        if (state.attendanceTimer > 0) state.attendanceTimer = Math.max(0, state.attendanceTimer - dt);
+        if (state.distractTimer > 0) {
+          state.distractTimer = Math.max(0, state.distractTimer - dt);
+          if (state.distractTimer === 0) {
+            state.distractType = null;
+            els.dreamOverlay.classList.remove('active');
+            els.sleepOverlay.classList.remove('active');
+          }
+        }
+        // Gradual natural focus recovery
+        if (state.distractTimer <= 0 && state.focus < 100) {
+          state.focus = Math.min(100, state.focus + dt * 2.2);
+        }
+        if (state.stumbleTimer > 0) state.stumbleTimer = Math.max(0, state.stumbleTimer - dt);
+        if (state.slideTimer > 0) state.slideTimer = Math.max(0, state.slideTimer - dt);
+
+        const speedMult = state.coffeeTimer > 0 ? 1.38 : 1.0;
+        const effSpeed = state.speed * speedMult;
+
+        // Advance distance & score
+        const dz = effSpeed * dt;
+        state.distance += dz;
+        state.score += dz * (state.coffeeTimer > 0 ? 1.6 : 1.0);
+
+        // Recover professor distance slowly when running cleanly
+        if (state.profDist < 9.5) {
+          state.profDist = Math.min(9.5, state.profDist + dt * (state.coffeeTimer > 0 ? 1.4 : 0.32));
+        }
+
+        // Check Semester Milestones & GRADUATION FINALE
+        if (!state.endlessMode) {
+          if (!state.finaleActive && state.distance >= GRADUATION_DISTANCE) {
+            state.finaleActive = true;
+            state.speed = 33.0;
+            state.profDist = Math.min(state.profDist, 6.2);
+            setActiveProfessor('hod');
+            SoundFX.semester();
+            showToast('🎓 GRADUATION FINALE!', 'Final Boss: HOD is chasing you! Cross the Finish Line!', 3200);
+          }
+          if (state.finaleActive && state.distance >= FINALE_END_DISTANCE) {
+            startVictoryCinematic();
+            renderer.render(scene, camera);
+            return;
+          }
+          if (state.semesterIdx < SEMESTERS.length - 1 && state.distance >= SEMESTERS[state.semesterIdx + 1].dist) {
+            state.semesterIdx++;
+            const sem = SEMESTERS[state.semesterIdx];
+            state.speed = sem.speed;
+            setActiveProfessor(sem.prof);
+            SoundFX.semester();
+            state.attendance = Math.min(100, state.attendance + 6);
+            state.focus = Math.min(100, state.focus + 12);
+            showToast(`Semester ${sem.num}: ${sem.name}`, sem.msg, 3000);
+          }
+          // Approach graduation finish line gate during Finale
+          if (state.finaleActive) {
+            const rem = FINALE_END_DISTANCE - state.distance;
+            distantGate.position.z = -Math.max(2, rem);
+          }
+        } else {
+          state.speed = Math.min(38, state.speed + dt * 0.15);
+        }
+
+        // Periodic funny quotes
+        state.quoteTimer -= dt;
+        if (state.quoteTimer <= 0) {
+          state.quoteTimer = 11 + Math.random() * 6;
+          const q = FUNNY_QUOTES[Math.floor(Math.random() * FUNNY_QUOTES.length)];
+          showToast('Campus Alert!', q, 2100);
+        }
+
+        // Smooth lane & jump physics
+        state.playerX += (state.targetX - state.playerX) * Math.min(1, dt * 14);
+        student.position.x = state.playerX;
+
+        if (state.isJumping) {
+          state.playerY += state.vy * dt;
+          state.vy -= 36 * dt;
+          if (state.playerY <= 0) {
+            state.playerY = 0;
+            state.vy = 0;
+            state.isJumping = false;
+          }
+        }
+        student.position.y = state.playerY;
+
+        // Recycle campus segments
+        for (let i = 0; i < campusSegments.length; i++) {
+          const seg = campusSegments[i];
+          seg.position.z += dz;
+          if (seg.position.z > SEGMENT_LENGTH) {
+            seg.position.z -= NUM_SEGMENTS * SEGMENT_LENGTH;
+          }
+        }
+
+        // Spawn obstacles & coins
+        state.spawnTimer -= dt;
+        if (state.spawnTimer <= 0) {
+          spawnWave();
+          state.spawnTimer = Math.max(0.68, 1.45 - state.semesterIdx * 0.08);
+        }
+
+        // Player hitbox
+        const pMinY = state.playerY;
+        const pMaxY = state.playerY + (state.slideTimer > 0 ? 0.9 : 1.9);
+
+        // Update Obstacles & Collisions
+        for (let i = activeObstacles.length - 1; i >= 0; i--) {
+          const o = activeObstacles[i];
+          o.mesh.position.z += dz;
+
+          // Falling assignment stack animation
+          if (o.mesh.userData.dropAnim && o.mesh.position.z > -38 && o.mesh.position.y > 0) {
+            o.mesh.position.y = Math.max(0, o.mesh.position.y - dt * 14);
+          }
+
+          // Check collision near z = 0
+          if (!o.hit && Math.abs(o.mesh.position.z) < 0.95 && Math.abs(o.mesh.position.x - state.playerX) < o.hitHalfW) {
+            if (pMaxY > o.hitMinY && pMinY < o.hitMaxY) {
+              o.hit = true;
+              if (state.coffeeTimer > 0) {
+                // Coffee boost smashes through!
+                o.mesh.visible = false;
+                state.score += 25;
+                SoundFX.shieldBreak();
+              } else if (state.smartNotes) {
+                state.smartNotes = false;
+                o.mesh.visible = false;
+                SoundFX.shieldBreak();
+                showToast('Smart Notes Used!', 'Protected from obstacle collision!', 1800);
+              } else {
+                triggerFailCrash(o);
+                renderer.render(scene, camera);
+                return;
+              }
+            }
+          }
+
+          if (o.mesh.position.z > 14) {
+            scene.remove(o.mesh);
+            activeObstacles.splice(i, 1);
+          }
+        }
+
+        // Update Coins
+        for (let i = activeCoins.length - 1; i >= 0; i--) {
+          const c = activeCoins[i];
+          c.mesh.position.z += dz;
+          c.mesh.rotation.y += dt * 4.5;
+          c.mesh.position.y = c.baseY + Math.sin(now * 0.006 + c.mesh.position.z) * 0.12;
+
+          if (!c.collected && Math.abs(c.mesh.position.z) < 1.15 && Math.abs(c.mesh.position.x - state.playerX) < 1.0 && Math.abs(c.mesh.position.y - (state.playerY + 1.0)) < 1.25) {
+            c.collected = true;
+            state.credits += 1;
+            state.score += 15;
+            SoundFX.coin();
+            els.credits.classList.add('pop');
+            setTimeout(() => els.credits.classList.remove('pop'), 130);
+            scene.remove(c.mesh);
+            activeCoins.splice(i, 1);
+            continue;
+          }
+
+          if (c.mesh.position.z > 12) {
+            scene.remove(c.mesh);
+            activeCoins.splice(i, 1);
+          }
+        }
+
+        // Update Powerups
+        for (let i = activePowerups.length - 1; i >= 0; i--) {
+          const p = activePowerups[i];
+          p.mesh.position.z += dz;
+          p.mesh.rotation.y += dt * 3.0;
+
+          if (!p.collected && Math.abs(p.mesh.position.z) < 1.2 && Math.abs(p.mesh.position.x - state.playerX) < 1.05 && Math.abs(p.mesh.position.y - (state.playerY + 1.0)) < 1.35) {
+            p.collected = true;
+            SoundFX.powerup();
+            if (p.type === 'COFFEE') {
+              state.coffeeTimer = 5.5;
+              showToast('☕ COFFEE BOOST!', 'Canteen Espresso! Speed & Smash active!', 2000);
+            } else if (p.type === 'SMART_NOTES') {
+              state.smartNotes = true;
+              showToast('📘 SMART NOTES!', '1-hit obstacle protection active!', 2000);
+            } else if (p.type === 'ATTENDANCE_CARD') {
+              state.attendanceTimer = 7.0;
+              state.attendance = Math.min(100, state.attendance + 18);
+              state.lowAttendanceWarned = false;
+              state.profDist = Math.min(9.5, state.profDist + 2.0);
+              showToast('🪪 ATTENDANCE CARD!', '75%+ Verified! Safe from capture!', 2000);
+            }
+            scene.remove(p.mesh);
+            activePowerups.splice(i, 1);
+            continue;
+          }
+
+          if (p.mesh.position.z > 12) {
+            scene.remove(p.mesh);
+            activePowerups.splice(i, 1);
+          }
+        }
+
+        // Update Distractions & Study Books
+        for (let i = activeDistractions.length - 1; i >= 0; i--) {
+          const dItem = activeDistractions[i];
+          dItem.mesh.position.z += dz;
+          dItem.mesh.rotation.y += dt * 3.2;
+
+          if (!dItem.collected && Math.abs(dItem.mesh.position.z) < 1.2 && Math.abs(dItem.mesh.position.x - state.playerX) < 1.05 && Math.abs(dItem.mesh.position.y - (state.playerY + 1.0)) < 1.35) {
+            dItem.collected = true;
+            if (dItem.type === 'STUDY_BOOK') {
+              state.focus = Math.min(100, state.focus + 28);
+              state.attendance = Math.min(100, state.attendance + 5);
+              state.score += 40;
+              SoundFX.study();
+              showToast('📚 Study Book!', 'Focus +28% & Attendance +5%!', 1800);
+            } else {
+              SoundFX.distract();
+              state.distractType = dItem.type;
+              state.distractTimer = 3.2;
+              if (dItem.type === 'PHONE') {
+                state.focus = Math.max(15, state.focus - 22);
+                showToast('📱 Notification!', 'New notification! Focus, student!', 2000);
+              } else if (dItem.type === 'HEART') {
+                state.focus = Math.max(15, state.focus - 20);
+                els.dreamOverlay.classList.add('active');
+                showToast('💘 Crush Spotted!', 'Daydream detected!', 2000);
+              } else if (dItem.type === 'GAMING') {
+                state.focus = Math.max(15, state.focus - 25);
+                showToast('🎮 Squad Invite!', 'Game invitation received!', 2000);
+              } else if (dItem.type === 'SLEEP') {
+                state.focus = Math.max(15, state.focus - 18);
+                state.attendance = Math.max(40, state.attendance - 6);
+                els.sleepOverlay.classList.add('active');
+                showToast('😴 All-Nighter!', 'Exam tomorrow. Wake up!', 2000);
+              } else if (dItem.type === 'FRIEND') {
+                state.attendance = Math.max(40, state.attendance - 10);
+                state.focus = Math.max(15, state.focus - 12);
+                showToast('☕ Chai Break?', 'Professor has noticed your absence!', 2000);
+              }
+              if (state.attendance < 75 && !state.lowAttendanceWarned) {
+                state.lowAttendanceWarned = true;
+                state.profDist = Math.max(4.2, state.profDist - 1.5);
+                setTimeout(() => {
+                  if (state.mode === 'PLAYING') showToast('🚨 < 75% Attendance!', 'Attendance shortage detected!', 2200);
+                }, 900);
+              }
+            }
+            scene.remove(dItem.mesh);
+            activeDistractions.splice(i, 1);
+            continue;
+          }
+
+          if (dItem.mesh.position.z > 12) {
+            scene.remove(dItem.mesh);
+            activeDistractions.splice(i, 1);
+          }
+        }
+
+        animateCharacters(dt, effSpeed);
+
+        // Smooth Camera Follow + subtle Coffee FOV boost
+        const targetFov = state.coffeeTimer > 0 ? 68 : 60;
+        if (Math.abs(camera.fov - targetFov) > 0.1) {
+          camera.fov += (targetFov - camera.fov) * dt * 6;
+          camera.updateProjectionMatrix();
+        }
+        const shakeX = state.stumbleTimer > 0 ? (Math.random() - 0.5) * 0.3 : 0;
+        const focusSway = state.focus < 45 ? Math.sin(now * 0.008) * 0.14 : 0;
+        camera.position.x += (state.playerX * 0.55 - camera.position.x) * Math.min(1, dt * 8) + shakeX + focusSway;
+        camera.position.y += (4.8 + state.playerY * 0.45 - camera.position.y) * Math.min(1, dt * 8);
+        camera.position.z = 8.6;
+        camera.lookAt(state.playerX * 0.35, 1.6 + state.playerY * 0.4, -10);
+
+        updateHUD();
+        renderer.render(scene, camera);
+      }
+
+      // Resize Handler
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        updateTouchVisibility();
+      });
+
+      window.onload = () => {
+        lastTime = performance.now();
+        requestAnimationFrame(loop);
+      };
+    })();
+  </script>
+</body>
+</html>
